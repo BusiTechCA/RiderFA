@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#4472C4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<title>RideTrack</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f7;--card:#fff;--pri:#4472C4;--grn:#34a853;--red:#ea4335;--amb:#fbbc04;--pur:#7c3aed;--txt:#1a1a1a;--mut:#6b7280;--brd:#e5e7eb;--ibg:#f9fafb;--rad:12px;--sh:0 1px 3px rgba(0,0,0,.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;padding-bottom:80px}
+.header{background:var(--pri);color:#fff;padding:14px 20px;position:sticky;top:0;z-index:100}
+.header h1{font-size:18px;font-weight:600}
+.header p{font-size:11px;opacity:.8}
+.tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--brd);position:sticky;top:50px;z-index:99;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 13px;font-size:11px;font-weight:500;white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;color:var(--mut);transition:.2s;position:relative}
+.tab.active{color:var(--pri);border-bottom-color:var(--pri)}
+.tab .badge{position:absolute;top:4px;right:4px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.page{display:none;padding:16px}
+.page.active{display:block}
+.card{background:var(--card);border-radius:var(--rad);padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
+.card h3{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--pri)}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.met{background:var(--ibg);border-radius:8px;padding:12px}
+.met .ml{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.met .mv{font-size:20px;font-weight:700;margin-top:2px}
+.met .mv.grn{color:var(--grn)}
+.met .mv.red{color:var(--red)}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:12px;font-weight:500;color:var(--mut);margin-bottom:4px}
+.fg input,.fg select{width:100%;padding:10px 12px;border:1px solid var(--brd);border-radius:8px;font-size:14px;background:var(--ibg);-webkit-appearance:none}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+.bp{background:var(--pri);color:#fff}
+.bp:active{transform:scale(.98)}
+.bd{background:var(--red);color:#fff;padding:8px 14px;font-size:12px;width:auto;border-radius:6px}
+.be{background:var(--grn);color:#fff;margin-top:8px}
+.sr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--brd);font-size:13px}
+.sr:last-child{border:none}
+.sr .c{color:var(--mut)}
+.sr .a{font-weight:600}
+.tr{display:flex;justify-content:space-between;padding:10px 0;font-size:15px;font-weight:700;border-top:2px solid var(--txt)}
+.ib{background:#e3f2fd;border-radius:8px;padding:12px;font-size:12px;color:#1565c0;margin-bottom:12px}
+.pb{height:8px;background:var(--brd);border-radius:4px;overflow:hidden;margin-top:4px}
+.pf{height:100%;background:var(--pri);border-radius:4px;transition:.3s}
+.si{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--brd)}
+.si label{font-size:13px;flex:1}
+.si input{width:80px;text-align:right;padding:6px 8px;border:1px solid var(--brd);border-radius:6px;font-size:13px}
+
+/* TRACKING STATUS BAR */
+.track-bar{background:#1b5e20;color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;display:none}
+.track-bar.active{display:flex}
+.track-bar .dot{width:10px;height:10px;border-radius:50%;background:#4caf50;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.track-bar .info{flex:1;font-size:12px}
+.track-bar .info strong{font-size:14px}
+.track-bar .stop-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+
+/* TRIP CARD WITH CLASSIFY BUTTONS */
+.trip-card{background:var(--card);border-radius:var(--rad);padding:14px;margin-bottom:10px;box-shadow:var(--sh);border-left:4px solid var(--amb)}
+.trip-card.classified{border-left-color:var(--grn);opacity:.7}
+.trip-card .tc-top{display:flex;justify-content:space-between;align-items:flex-start}
+.trip-card .tc-route{flex:1}
+.trip-card .tc-km{font-size:18px;font-weight:700;color:var(--pri);text-align:right}
+.trip-card .tc-addr{font-size:13px;font-weight:500;margin-bottom:2px}
+.trip-card .tc-addr span{color:var(--mut);font-weight:400}
+.trip-card .tc-meta{font-size:11px;color:var(--mut);margin-top:4px}
+.trip-card .tc-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+.tc-btn{padding:10px 4px;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;text-align:center;line-height:1.3}
+.tc-btn:active{transform:scale(.95)}
+.tc-btn.personal{background:#f3e8ff;color:#7c3aed}
+.tc-btn.finding{background:#fff3e0;color:#e65100}
+.tc-btn.passenger{background:#e8f5e9;color:#2e7d32}
+.tc-btn .tc-icon{font-size:16px;display:block;margin-bottom:2px}
+.classified-label{display:inline-block;font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600;margin-top:8px}
+.cl-personal{background:#f3e8ff;color:#7c3aed}
+.cl-finding{background:#fff3e0;color:#e65100}
+.cl-passenger{background:#e8f5e9;color:#2e7d32}
+
+/* CAPTURE */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cb{background:var(--card);border:2px dashed var(--brd);border-radius:var(--rad);padding:20px 12px;text-align:center;cursor:pointer;transition:.2s}
+.cb:active{background:var(--ibg);border-color:var(--pri)}
+.cb .ci{font-size:28px;margin-bottom:4px}
+.cb .cl2{font-size:12px;font-weight:600}
+.cb .cd{font-size:10px;color:var(--mut)}
+.fi{display:none}
+.aso{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.25s}
+.aso.show{opacity:1;pointer-events:auto}
+.ash{background:var(--card);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:500px;transform:translateY(100%);transition:.3s}
+.aso.show .ash{transform:translateY(0)}
+.ash h4{font-size:14px;font-weight:600;text-align:center;margin-bottom:4px}
+.ash p{font-size:12px;color:var(--mut);text-align:center;margin-bottom:16px}
+.ao{display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;background:var(--ibg);margin-bottom:8px;cursor:pointer;border:none;width:100%;text-align:left;font-family:inherit}
+.ao:active{background:var(--brd);transform:scale(.98)}
+.ao .aoi{font-size:24px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--card);border-radius:10px;border:1px solid var(--brd)}
+.ao .aot{font-size:14px;font-weight:600}
+.ao .aos{font-size:11px;color:var(--mut)}
+.ac{width:100%;padding:14px;border:none;border-radius:10px;background:var(--brd);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;font-family:inherit}
+
+/* STEP */
+.step{background:var(--ibg);border-radius:8px;padding:14px;margin-bottom:10px;border-left:3px solid var(--pri)}
+.step .sn{font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase}
+.step .st{font-size:14px;font-weight:600;margin:2px 0}
+.step .sb{font-size:13px;color:var(--mut);line-height:1.6}
+
+.rt-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--brd)}
+.rt-card{background:var(--ibg);border-radius:8px;padding:10px;margin-bottom:10px}
+.rt-card .meta{font-size:11px;color:var(--mut);margin-top:6px}
+.tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:12px;font-weight:600;margin-right:4px}
+.tag-inc{background:#e8f5e9;color:#2e7d32}
+.tag-exp{background:#fbe9e7;color:#c62828}
+.vs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.vs div{background:var(--ibg);border-radius:8px;padding:10px;text-align:center}
+.vs .num{font-size:20px;font-weight:700;color:var(--pri)}
+.vs .lbl{font-size:10px;color:var(--mut)}
+.wb{background:#fff3e0;border-radius:8px;padding:12px;font-size:12px;color:#e65100;margin-bottom:12px}
+.w2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.w2 div{border-radius:8px;padding:14px;text-align:center}
+.winner{background:#e8f5e9;border:2px solid var(--grn)}
+.loser{background:var(--ibg)}
+.winner h4,.loser h4{font-size:13px;color:var(--mut)}
+.winner .big{font-size:24px;font-weight:700;color:var(--grn)}
+.loser .big{font-size:24px;font-weight:700;color:var(--mut)}
+</style>
+</head>
+<body>
+
+<!-- PERSISTENT TRACKING BAR (shows when tracking is on) -->
+<div class="track-bar" id="track-bar" onclick="scrollToTrack()">
+  <div class="dot"></div>
+  <div class="info"><strong id="bar-km">0.0 km</strong> &middot; <span id="bar-time">0:00</span> &middot; Tracking active</div>
+  <button class="stop-btn" onclick="event.stopPropagation();stopAutoTrack()">Pause</button>
+</div>
+
+<div class="header">
+  <h1>RideTrack</h1>
+  <p>Auto-tracking &middot; CRA-Compliant</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-page="trips">Trips</div>
+  <div class="tab" data-page="track">Track</div>
+  <div class="tab" data-page="dashboard">Dashboard</div>
+  <div class="tab" data-page="income">Income</div>
+  <div class="tab" data-page="expenses">Expenses</div>
+  <div class="tab" data-page="capture">Capture</div>
+  <div class="tab" data-page="vault">Vault</div>
+  <div class="tab" data-page="pnl">P&L</div>
+  <div class="tab" data-page="cra">CRA</div>
+  <div class="tab" data-page="taxguide">Tax Guide</div>
+  <div class="tab" data-page="settings">Settings</div>
+</div>
+
+<!-- ===== TRIPS (MileIQ-style classify) ===== -->
+<div class="page active" id="page-trips">
+  <div class="card" id="unclassified-header"></div>
+  <div id="unclassified-list"></div>
+  <div class="card" style="margin-top:16px"><h3>Recently classified</h3><div id="classified-list"></div></div>
+</div>
+
+<!-- ===== TRACKING CONTROL ===== -->
+<div class="page" id="page-track">
+  <div class="card" style="text-align:center">
+    <h3>Auto-tracking</h3>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:16px">When enabled, the app detects when you start driving (>20 km/h) and automatically logs each trip. Stops longer than 2 minutes end a trip.</p>
+    <button class="btn bp" id="auto-toggle" onclick="toggleAutoTrack()" style="font-size:16px;padding:16px">Enable auto-tracking</button>
+    <div id="track-stats" style="margin-top:16px"></div>
+  </div>
+  <div class="ib">Keep this app open in the background (switch to Uber/Lyft as normal). On Android, the green bar at the top keeps tracking alive. For best results, add the app to your home screen first.</div>
+  <div class="card"><h3>Today's summary</h3><div id="today-summary"></div></div>
+  <div class="card">
+    <h3>Manual trip entry</h3>
+    <div class="fg"><label>Date</label><input type="date" id="m-date"></div>
+    <div class="fr">
+      <div class="fg"><label>Distance (km)</label><input type="number" id="m-km" step="0.1"></div>
+      <div class="fg"><label>Type</label>
+        <select id="m-type"><option value="unclassified">Classify later</option><option value="passenger">Passenger trip</option><option value="finding">Finding riders</option><option value="personal">Personal</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Notes</label><input type="text" id="m-notes" placeholder="Optional"></div>
+    <button class="btn bp" onclick="addManualTrip()">Add trip</button>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="page" id="page-dashboard">
+  <div class="mg" id="dash-metrics"></div>
+  <div class="card" style="margin-top:12px"><h3>Per-km efficiency</h3><div id="dash-eff"></div></div>
+  <div class="card"><h3>Platform breakdown</h3><div id="dash-plat"></div></div>
+  <div class="card"><h3>Audit readiness</h3><div id="dash-audit"></div></div>
+</div>
+
+<!-- ===== INCOME ===== -->
+<div class="page" id="page-income">
+  <div class="card">
+    <h3>Log income</h3>
+    <div class="fr">
+      <div class="fg"><label>Date</label><input type="date" id="i-date"></div>
+      <div class="fg"><label>Platform</label><select id="i-plat"><option>Uber</option><option>Lyft</option><option>Other</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Trip earnings ($)</label><input type="number" id="i-earn" step="0.01"></div>
+      <div class="fg"><label>Tips ($)</label><input type="number" id="i-tips" step="0.01" value="0"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Bonuses ($)</label><input type="number" id="i-bonus" step="0.01" value="0"></div>
+      <div class="fg"><label>Tolls reimb ($)</label><input type="number" id="i-tolls" step="0.01" value="0"></div>
+    </div>
+    <button class="btn bp" onclick="addIncome()">Add income</button>
+  </div>
+  <div class="card"><h3>YTD</h3><div id="inc-total"></div></div>
+  <div id="inc-list"></div>
+</div>
+
+<!-- ===== EXPENSES ===== -->
+<div class="page" id="page-expenses">
+  <div class="card">
+    <h3>Log expense</h3>
+    <div class="fr">
+      <div class="fg"><label>Date</label><input type="date" id="e-date"></div>
+      <div class="fg"><label>Category</label><select id="e-cat"><option>Fuel</option><option>Maintenance</option><option>Insurance</option><option>Depreciation/CCA</option><option>License/Registration</option><option>Interest on Car Loan</option><option>Parking</option><option>Tolls</option><option>Car Wash</option><option>Phone/Data</option><option>Supplies</option><option>Other</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Amount ($)</label><input type="number" id="e-amt" step="0.01"></div>
+      <div class="fg"><label>Allocation</label><select id="e-alloc"><option value="Shared">Shared</option><option value="Fully Business">100% Business</option><option value="Fully Personal">100% Personal</option></select></div>
+    </div>
+    <div class="fg"><label>Description</label><input type="text" id="e-desc" placeholder="e.g. Gas - Shell"></div>
+    <button class="btn bp" onclick="addExpense()">Add expense</button>
+  </div>
+  <div class="card"><h3>By category</h3><div id="exp-cats"></div></div>
+  <div id="exp-list"></div>
+</div>
+
+<!-- ===== CAPTURE ===== -->
+<div class="page" id="page-capture">
+  <div class="ib">Tap any button below. Choose to snap a photo or upload a file (screenshot, PDF, email receipt).</div>
+  <div class="cg">
+    <div class="cb" onclick="openSheet('income-uber','Uber pay','Snap or upload Uber earnings')"><div class="ci">&#128663;</div><div class="cl2">Uber pay</div><div class="cd">Snap / upload</div></div>
+    <div class="cb" onclick="openSheet('income-lyft','Lyft pay','Snap or upload Lyft earnings')"><div class="ci">&#128660;</div><div class="cl2">Lyft pay</div><div class="cd">Snap / upload</div></div>
+    <div class="cb" onclick="openSheet('receipt-fuel','Gas receipt','Paper or digital receipt')"><div class="ci">&#9981;</div><div class="cl2">Gas receipt</div><div class="cd">Snap / upload</div></div>
+    <div class="cb" onclick="openSheet('receipt-maint','Maintenance','Oil, tires, repairs')"><div class="ci">&#128295;</div><div class="cl2">Maintenance</div><div class="cd">Snap / upload</div></div>
+    <div class="cb" onclick="openSheet('receipt-ins','Insurance','Policy or payment')"><div class="ci">&#128196;</div><div class="cl2">Insurance</div><div class="cd">Snap / upload</div></div>
+    <div class="cb" onclick="openSheet('receipt-other','Other','Any expense proof')"><div class="ci">&#128206;</div><div class="cl2">Other</div><div class="cd">Snap / upload</div></div>
+  </div>
+  <input type="file" accept="image/*" capture="environment" id="cam-in" class="fi" onchange="handleCap(event)">
+  <input type="file" accept="image/*,application/pdf" id="gal-in" class="fi" onchange="handleCap(event)">
+  <div class="aso" id="cap-sheet" onclick="closeSheet(event)"><div class="ash">
+    <h4 id="sh-title">Capture</h4><p id="sh-desc">Choose method</p>
+    <button class="ao" onclick="doCap('cam')"><div class="aoi">&#128247;</div><div><div class="aot">Take photo</div><div class="aos">Camera for paper receipts or screen</div></div></button>
+    <button class="ao" onclick="doCap('gal')"><div class="aoi">&#128193;</div><div><div class="aot">Upload file</div><div class="aos">Screenshot, PDF, or saved image</div></div></button>
+    <button class="ac" onclick="closeSheet()">Cancel</button>
+  </div></div>
+</div>
+
+<!-- ===== VAULT ===== -->
+<div class="page" id="page-vault">
+  <div class="vs" id="vault-stats"></div>
+  <div class="fr" style="margin-bottom:12px">
+    <div class="fg"><label>Type</label><select id="vf" onchange="renderVault()"><option value="all">All</option><option value="income">Income</option><option value="receipt">Receipts</option></select></div>
+    <div class="fg"><label>Month</label><select id="vm" onchange="renderVault()"><option value="all">All</option></select></div>
+  </div>
+  <div id="vault-list"></div>
+  <button class="btn be" onclick="exportVault()">Export vault</button>
+</div>
+
+<!-- ===== P&L ===== -->
+<div class="page" id="page-pnl"><div class="card"><h3>Income statement</h3><div id="pnl"></div></div></div>
+
+<!-- ===== CRA ===== -->
+<div class="page" id="page-cra">
+  <div class="ib">CRA mileage rate vs actual expenses — which saves more?</div>
+  <div id="cra"></div>
+</div>
+
+<!-- ===== TAX GUIDE ===== -->
+<div class="page" id="page-taxguide">
+  <div class="card">
+    <h3>File your own taxes (T2125)</h3>
+    <div class="step"><div class="sn">Step 1</div><div class="st">Get your annual summary</div><div class="sb">Uber/Lyft email you a tax summary in Jan/Feb. This is NOT a T4 — rideshare is self-employment.</div></div>
+    <div class="step"><div class="sn">Step 2</div><div class="st">Use free tax software</div><div class="sb">Wealthsimple Tax (free) or StudioTax. Both are CRA NETFILE certified.</div></div>
+    <div class="step"><div class="sn">Step 3</div><div class="st">Add Form T2125</div><div class="sb">Industry code: 485310 (Rideshare). Enter your total income from this app's Dashboard.</div></div>
+    <div class="step"><div class="sn">Step 4</div><div class="st">Enter vehicle expenses</div><div class="sb">Use the CRA tab to see which method (mileage rate vs actual) gives bigger deduction. Enter all categories from P&L.</div></div>
+    <div class="step"><div class="sn">Step 5</div><div class="st">CCA for your car</div><div class="sb">Class 10 or 10.1 (if >$38K). Software calculates it — enter purchase price and business start date.</div></div>
+    <div class="step"><div class="sn">Step 6</div><div class="st">HST/GST</div><div class="sb">Register if income >$30K in 4 consecutive quarters. Below that it's optional.</div></div>
+    <div class="step"><div class="sn">Step 7</div><div class="st">Keep records 6 years</div><div class="sb">CRA requires 6 years of records. Your Vault captures + data exports are your evidence. Back up regularly!</div></div>
+  </div>
+  <div class="card"><h3>Audit readiness</h3><div id="audit-score"></div></div>
+</div>
+
+<!-- ===== SETTINGS ===== -->
+<div class="page" id="page-settings">
+  <div class="card">
+    <h3>Business-use %</h3>
+    <div id="app-info"></div>
+    <div class="fg" style="margin-top:12px"><label>Manual override %</label><input type="number" id="s-ov" step="0.1" min="0" max="100" placeholder="Blank = auto"></div>
+    <button class="btn bp" onclick="saveOv()">Save</button>
+    <button class="btn" style="background:var(--brd);margin-top:8px" onclick="clearOv()">Clear</button>
+  </div>
+  <div class="card">
+    <h3>Vehicle</h3>
+    <div class="si"><label>Car price ($)</label><input type="number" id="s-cp" value="28500"></div>
+    <div class="si"><label>Useful life (yrs)</label><input type="number" id="s-cl" value="7"></div>
+    <div class="si"><label>Years owned</label><input type="number" id="s-yo" value="1.75" step="0.25"></div>
+    <div class="si"><label>Starting odometer</label><input type="number" id="s-od" value="67450"></div>
+    <button class="btn bp" style="margin-top:12px" onclick="saveCar()">Save</button>
+  </div>
+  <div class="card">
+    <h3>CRA rates</h3>
+    <div class="si"><label>First 5,000 km</label><input type="number" id="s-r1" value="0.72" step="0.01"></div>
+    <div class="si"><label>Above 5,000 km</label><input type="number" id="s-r2" value="0.66" step="0.01"></div>
+    <button class="btn bp" style="margin-top:12px" onclick="saveCRA()">Save</button>
+  </div>
+  <div class="card">
+    <h3>Data</h3>
+    <button class="btn be" onclick="exportAll()">Full backup</button>
+    <div class="fg" style="margin-top:12px"><label>Restore</label><input type="file" id="imp" accept=".json" onchange="importD(event)"></div>
+    <button class="btn bd" style="width:100%;margin-top:12px" onclick="if(confirm('DELETE ALL?')){localStorage.clear();location.reload()}">Reset</button>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const D=(k,v)=>{if(v===undefined){try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}}localStorage.setItem(k,JSON.stringify(v))};
+const O=(k,v)=>{if(v===undefined){try{return JSON.parse(localStorage.getItem(k))||{}}catch{return{}}}localStorage.setItem(k,JSON.stringify(v))};
+const $=id=>document.getElementById(id);
+
+// ===== NAV =====
+document.querySelectorAll('.tab').forEach(t=>{t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');$('page-'+t.dataset.page).classList.add('active');render()
+})});
+
+// ===== AUTO GPS TRACKING =====
+let autoTrack=false, watchId=null, curTrip=null, tripTimer=null, stopTimeout=null, wakeLock=null
+const SPEED_THRESH=20/3.6, STOP_TIME=120000 // 20km/h in m/s, 2min stop
+
+function toggleAutoTrack(){
+  if(autoTrack) stopAutoTrack(); else startAutoTrack()
+}
+
+function startAutoTrack(){
+  if(!navigator.geolocation)return alert('GPS not available')
+  autoTrack=true
+  $('auto-toggle').textContent='Disable auto-tracking'
+  $('auto-toggle').style.background='var(--red)'
+  $('track-bar').classList.add('active')
+  
+  // Wake lock
+  if('wakeLock' in navigator) navigator.wakeLock.request('screen').then(l=>{wakeLock=l}).catch(()=>{})
+  
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    const speed=pos.coords.speed||0
+    const pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now(),speed}
+    
+    if(!curTrip && speed>=SPEED_THRESH){
+      // START new trip
+      curTrip={id:Date.now(),startTime:Date.now(),points:[pt],startLat:pt.lat,startLng:pt.lng,dist:0,moving:true}
+      reverseGeo(pt.lat,pt.lng).then(a=>{if(curTrip)curTrip.startAddr=a})
+      if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
+    } else if(curTrip){
+      const last=curTrip.points[curTrip.points.length-1]
+      const d=hav(last.lat,last.lng,pt.lat,pt.lng)
+      if(d>0.008) {curTrip.dist+=d;curTrip.points.push(pt)}
+      curTrip.endLat=pt.lat;curTrip.endLng=pt.lng
+      
+      if(speed>=SPEED_THRESH){
+        curTrip.moving=true
+        if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
+      } else if(speed<5/3.6 && curTrip.moving){
+        curTrip.moving=false
+        // Start stop timer - if stopped >2min, end trip
+        if(!stopTimeout){
+          stopTimeout=setTimeout(()=>{
+            if(curTrip && !curTrip.moving) finishTrip()
+            stopTimeout=null
+          }, STOP_TIME)
+        }
+      }
+      // Update bar
+      $('bar-km').textContent=curTrip.dist.toFixed(1)+' km'
+      const el=Math.floor((Date.now()-curTrip.startTime)/1000)
+      $('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)
+    }
+  },err=>{console.log('GPS err',err)},{enableHighAccuracy:true,maximumAge:3000,timeout:10000})
+  
+  tripTimer=setInterval(()=>{
+    if(curTrip){
+      const el=Math.floor((Date.now()-curTrip.startTime)/1000)
+      $('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)
+    }
+  },1000)
+}
+
+function stopAutoTrack(){
+  if(curTrip) finishTrip()
+  autoTrack=false
+  if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null}
+  if(tripTimer){clearInterval(tripTimer);tripTimer=null}
+  if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
+  if(wakeLock){wakeLock.release();wakeLock=null}
+  $('auto-toggle').textContent='Enable auto-tracking'
+  $('auto-toggle').style.background='var(--pri)'
+  $('track-bar').classList.remove('active')
+  $('bar-km').textContent='0.0 km';$('bar-time').textContent='0:00'
+  render()
+}
+
+function finishTrip(){
+  if(!curTrip||curTrip.dist<0.1)return curTrip=null
+  const trip={
+    id:curTrip.id,
+    date:new Date(curTrip.startTime).toISOString().slice(0,10),
+    time:new Date(curTrip.startTime).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
+    endTime:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
+    totalKm:Math.round(curTrip.dist*10)/10,
+    duration:Math.floor((Date.now()-curTrip.startTime)/60000),
+    startAddr:curTrip.startAddr||'',
+    endAddr:'',
+    type:'unclassified',
+    gps:true
+  }
+  // Get end address
+  if(curTrip.endLat) reverseGeo(curTrip.endLat,curTrip.endLng).then(a=>{
+    const trips=D('trips');const t=trips.find(x=>x.id===trip.id);if(t){t.endAddr=a;D('trips',trips);render()}
+  })
+  
+  const trips=D('trips');trips.unshift(trip);D('trips',trips)
+  curTrip=null
+  // Vibrate to notify
+  if(navigator.vibrate)navigator.vibrate([200,100,200])
+  render()
+}
+
+// Reverse geocoding (free, no API key)
+async function reverseGeo(lat,lng){
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=16`)
+    const d=await r.json()
+    const a=d.address
+    return a.road||a.pedestrian||a.suburb||a.city||a.town||'Unknown'
+  }catch{return''}
+}
+
+function hav(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function scrollToTrack(){document.querySelector('[data-page="trips"]').click()}
+
+// ===== CLASSIFY TRIP =====
+function classifyTrip(id,type){
+  const trips=D('trips'),t=trips.find(x=>x.id===id)
+  if(!t)return
+  t.type=type
+  // Set business km
+  if(type==='personal'){t.bizKm=0;t.persKm=t.totalKm}
+  else{t.bizKm=t.totalKm;t.persKm=0}
+  D('trips',trips)
+  // Add to mileage for calculations
+  render()
+}
+
+function deleteTrip(id){if(!confirm('Delete?'))return;D('trips',D('trips').filter(t=>t.id!==id));render()}
+
+// ===== MANUAL TRIP =====
+function addManualTrip(){
+  const d=$('m-date').value,km=parseFloat($('m-km').value),type=$('m-type').value
+  if(!d||!km||km<=0)return alert('Fill date and km')
+  const trip={id:Date.now(),date:d,time:'',endTime:'',totalKm:km,duration:0,startAddr:'Manual',endAddr:'',type,gps:false,
+    bizKm:type==='personal'?0:type==='unclassified'?0:km,persKm:type==='personal'?km:0,notes:$('m-notes').value}
+  const trips=D('trips');trips.unshift(trip);D('trips',trips)
+  $('m-km').value='';$('m-notes').value='';render()
+}
+
+// ===== INCOME/EXPENSE =====
+function addIncome(){
+  const d=$('i-date').value,p=$('i-plat').value,earn=parseFloat($('i-earn').value)||0
+  const tips=parseFloat($('i-tips').value)||0,bonus=parseFloat($('i-bonus').value)||0,tolls=parseFloat($('i-tolls').value)||0
+  if(!d||earn===0)return alert('Fill date & earnings')
+  D('income',[...D('income'),{id:Date.now(),date:d,platform:p,earn,tips,bonus,tolls,total:earn+tips+bonus+tolls}])
+  $('i-earn').value='';$('i-tips').value='0';$('i-bonus').value='0';$('i-tolls').value='0';render()
+}
+function addExpense(){
+  const d=$('e-date').value,cat=$('e-cat').value,amt=parseFloat($('e-amt').value)||0,alloc=$('e-alloc').value
+  if(!d||amt===0)return alert('Fill date & amount')
+  D('expenses',[...D('expenses'),{id:Date.now(),date:d,category:cat,desc:$('e-desc').value,amount:amt,alloc}])
+  $('e-amt').value='';$('e-desc').value='';render()
+}
+function delEntry(t,id){if(!confirm('Delete?'))return;D(t,D(t).filter(e=>e.id!==id));render()}
+
+// ===== CAPTURE =====
+let capType=''
+function openSheet(t,title,desc){capType=t;$('sh-title').textContent=title;$('sh-desc').textContent=desc;$('cap-sheet').classList.add('show')}
+function closeSheet(e){if(e&&e.target!==e.currentTarget)return;$('cap-sheet').classList.remove('show')}
+function doCap(m){$('cap-sheet').classList.remove('show');if(m==='cam')$('cam-in').click();else $('gal-in').click()}
+function handleCap(e){
+  const f=e.target.files[0];if(!f)return;const type=capType
+  const reader=new FileReader();reader.onload=function(ev){
+    const img=new Image();img.onload=function(){
+      const c=document.createElement('canvas'),mx=800,sc=mx/img.width
+      c.width=img.width>mx?mx:img.width;c.height=img.width>mx?img.height*sc:img.height
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height)
+      D('vault',[...D('vault'),{id:Date.now(),date:new Date().toISOString().slice(0,10),time:new Date().toLocaleTimeString(),type,image:c.toDataURL('image/jpeg',.7),label:({
+        'income-uber':'Uber earnings','income-lyft':'Lyft earnings','receipt-fuel':'Fuel receipt','receipt-maint':'Maintenance','receipt-ins':'Insurance','receipt-other':'Other receipt'
+      })[type]||type}]);e.target.value='';capType='';alert('Saved to Vault!');render()
+    };img.src=ev.target.result
+  };reader.readAsDataURL(f)
+}
+
+// ===== VAULT =====
+function renderVault(){
+  const all=D('vault').sort((a,b)=>b.id-a.id),fil=$('vf').value,mon=$('vm').value
+  let f=all;if(fil==='income')f=f.filter(v=>v.type.startsWith('income'));if(fil==='receipt')f=f.filter(v=>v.type.startsWith('receipt'));if(mon!=='all')f=f.filter(v=>v.date.slice(0,7)===mon)
+  $('vault-stats').innerHTML=`<div><div class="num">${all.length}</div><div class="lbl">Total</div></div><div><div class="num">${all.filter(v=>v.type.startsWith('income')).length}</div><div class="lbl">Income</div></div><div><div class="num">${all.filter(v=>v.type.startsWith('receipt')).length}</div><div class="lbl">Receipts</div></div>`
+  $('vault-list').innerHTML=f.length?f.map(v=>`<div class="rt-card"><img src="${v.image}" class="rt-thumb"><div class="meta"><span class="tag ${v.type.startsWith('income')?'tag-inc':'tag-exp'}">${v.label}</span>${v.date}</div><button style="background:none;border:none;color:var(--red);font-size:11px;margin-top:4px;cursor:pointer" onclick="D('vault',D('vault').filter(x=>x.id!==${v.id}));render()">delete</button></div>`).join(''):'<p style="font-size:13px;color:var(--mut);text-align:center;padding:20px">No captures yet</p>'
+  const months=[...new Set(all.map(v=>v.date.slice(0,7)))].sort().reverse();const sel=$('vm'),cv=sel.value;sel.innerHTML='<option value="all">All</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join('');sel.value=cv||'all'
+}
+
+// ===== SETTINGS =====
+function saveOv(){const v=$('s-ov').value,s=O('settings');s.overridePct=v?parseFloat(v):null;O('settings',s);render()}
+function clearOv(){const s=O('settings');s.overridePct=null;O('settings',s);$('s-ov').value='';render()}
+function saveCar(){const s=O('settings');s.carPrice=parseFloat($('s-cp').value)||28500;s.carLife=parseFloat($('s-cl').value)||7;s.yearsOwned=parseFloat($('s-yo').value)||1;s.odometer=parseFloat($('s-od').value)||67450;O('settings',s);alert('Saved!');render()}
+function saveCRA(){const s=O('settings');s.rate1=parseFloat($('s-r1').value)||.72;s.rate2=parseFloat($('s-r2').value)||.66;O('settings',s);alert('Saved!');render()}
+function exportAll(){const a={trips:D('trips'),income:D('income'),expenses:D('expenses'),vault:D('vault'),settings:O('settings')};dl('ridetrack_backup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(a),'application/json')}
+function exportVault(){const d=D('vault');if(!d.length)return alert('Empty');dl('vault_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(d),'application/json')}
+function importD(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.trips)D('trips',d.trips);if(d.income)D('income',d.income);if(d.expenses)D('expenses',d.expenses);if(d.vault)D('vault',d.vault);if(d.settings)O('settings',d.settings);alert('Restored!');render()}catch{alert('Invalid')}};r.readAsText(f)}
+function dl(n,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click()}
+
+// ===== CALCS =====
+function getSt(){return Object.assign({carPrice:28500,carLife:7,yearsOwned:1.75,rate1:.72,rate2:.66,odometer:67450},O('settings'))}
+function getBP(){const o=O('settings').overridePct;if(o!=null&&o!=='')return o/100;const t=D('trips').filter(x=>x.type!=='unclassified'),tk=t.reduce((s,x)=>s+x.totalKm,0),bk=t.reduce((s,x)=>s+(x.bizKm||0),0);return tk>0?bk/tk:0}
+function getBE(e){if(e.alloc==='Fully Business')return e.amount;if(e.alloc==='Fully Personal')return 0;return e.amount*getBP()}
+function fmt(n){return'$'+Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function fS(n){return(n<0?'-':'')+fmt(n)}
+
+// ===== MAIN RENDER =====
+function render(){
+  const trips=D('trips'),incomes=D('income').sort((a,b)=>b.date.localeCompare(a.date)),expenses=D('expenses').sort((a,b)=>b.date.localeCompare(a.date))
+  const vault=D('vault'),st=getSt(),bp=getBP()
+  const classified=trips.filter(t=>t.type!=='unclassified'),unclassified=trips.filter(t=>t.type==='unclassified')
+  const totalKm=classified.reduce((s,t)=>s+t.totalKm,0),bizKm=classified.reduce((s,t)=>s+(t.bizKm||0),0)
+  const totalIncome=incomes.reduce((s,e)=>s+e.total,0),totalBizExp=expenses.reduce((s,e)=>s+getBE(e),0),net=totalIncome-totalBizExp
+  const r1=st.rate1||.72,r2=st.rate2||.66,cra=bizKm<=5000?bizKm*r1:5000*r1+(bizKm-5000)*r2
+  const better=cra>totalBizExp?'CRA Mileage':(totalBizExp>cra?'Actual':'Equal')
+
+  // BADGE on Trips tab
+  const badge=document.querySelector('[data-page="trips"] .badge')
+  if(badge)badge.remove()
+  if(unclassified.length){const b=document.createElement('span');b.className='badge';b.textContent=unclassified.length;document.querySelector('[data-page="trips"]').appendChild(b)}
+
+  // TRIPS PAGE
+  $('unclassified-header').innerHTML=unclassified.length?
+    `<h3>Classify ${unclassified.length} trip${unclassified.length>1?'s':''}</h3><p style="font-size:12px;color:var(--mut)">Tap a button on each trip to categorize it</p>`
+    :`<h3>All caught up!</h3><p style="font-size:12px;color:var(--mut)">No unclassified trips. Enable auto-tracking in the Track tab.</p>`
+  
+  $('unclassified-list').innerHTML=unclassified.sort((a,b)=>b.id-a.id).slice(0,50).map(t=>`
+    <div class="trip-card">
+      <div class="tc-top">
+        <div class="tc-route">
+          <div class="tc-addr">${t.startAddr||'Start'} <span>&#8594;</span> ${t.endAddr||'End'}</div>
+          <div class="tc-meta">${t.date} ${t.time?'| '+t.time+' - '+t.endTime:''} | ${t.duration||0} min${t.gps?' | GPS':''}</div>
+        </div>
+        <div class="tc-km">${t.totalKm.toFixed(1)} km</div>
+      </div>
+      <div class="tc-btns">
+        <button class="tc-btn personal" onclick="classifyTrip(${t.id},'personal')"><span class="tc-icon">&#128100;</span>Personal</button>
+        <button class="tc-btn finding" onclick="classifyTrip(${t.id},'finding')"><span class="tc-icon">&#128269;</span>Finding riders</button>
+        <button class="tc-btn passenger" onclick="classifyTrip(${t.id},'passenger')"><span class="tc-icon">&#128176;</span>Passenger trip</button>
+      </div>
+    </div>`).join('')
+
+  $('classified-list').innerHTML=classified.sort((a,b)=>b.id-a.id).slice(0,20).map(t=>{
+    const cls=t.type==='personal'?'cl-personal':t.type==='finding'?'cl-finding':'cl-passenger'
+    const lbl=t.type==='personal'?'Personal':t.type==='finding'?'Finding riders':'Passenger trip'
+    return`<div class="trip-card classified" style="border-left-color:${t.type==='personal'?'var(--pur)':t.type==='finding'?'var(--amb)':'var(--grn)'}">
+      <div class="tc-top"><div class="tc-route"><div class="tc-addr">${t.startAddr||'Start'} <span>&#8594;</span> ${t.endAddr||'End'}</div><div class="tc-meta">${t.date} | ${t.totalKm.toFixed(1)} km</div></div><div class="tc-km">${t.totalKm.toFixed(1)}</div></div>
+      <span class="classified-label ${cls}">${lbl}</span>
+      <button style="background:none;border:none;color:var(--red);font-size:11px;float:right;margin-top:-20px;cursor:pointer" onclick="deleteTrip(${t.id})">delete</button>
+    </div>`
+  }).join('')||'<p style="font-size:13px;color:var(--mut)">No classified trips yet</p>'
+
+  // TRACK PAGE
+  const today=new Date().toISOString().slice(0,10)
+  const todayT=trips.filter(t=>t.date===today)
+  $('today-summary').innerHTML=`
+    <div class="sr"><span class="c">Trips today</span><span class="a">${todayT.length}</span></div>
+    <div class="sr"><span class="c">KM today</span><span class="a">${todayT.reduce((s,t)=>s+t.totalKm,0).toFixed(1)}</span></div>
+    <div class="sr"><span class="c">Unclassified</span><span class="a">${todayT.filter(t=>t.type==='unclassified').length}</span></div>`
+  $('track-stats').innerHTML=autoTrack?`<p style="font-size:13px;color:var(--grn);font-weight:600">Tracking active${curTrip?' — currently on a trip':' — waiting for movement'}</p>`
+    :`<p style="font-size:13px;color:var(--mut)">Tracking is off</p>`
+
+  // DASHBOARD
+  $('dash-metrics').innerHTML=`
+    <div class="met"><div class="ml">YTD income</div><div class="mv grn">${fS(totalIncome)}</div></div>
+    <div class="met"><div class="ml">YTD expenses</div><div class="mv red">${fS(totalBizExp)}</div></div>
+    <div class="met"><div class="ml">Net profit</div><div class="mv ${net>=0?'grn':'red'}">${fS(net)}</div></div>
+    <div class="met"><div class="ml">Business km</div><div class="mv">${bizKm.toFixed(1)}</div></div>
+    <div class="met"><div class="ml">Business %</div><div class="mv">${(bp*100).toFixed(1)}%</div><div class="pb"><div class="pf" style="width:${bp*100}%"></div></div></div>
+    <div class="met"><div class="ml">Best method</div><div class="mv" style="font-size:13px">${better}</div></div>`
+  $('dash-eff').innerHTML=bizKm>0?`<div class="sr"><span class="c">Income/km</span><span class="a">${fmt(totalIncome/bizKm)}</span></div><div class="sr"><span class="c">Expense/km</span><span class="a">${fmt(totalBizExp/bizKm)}</span></div><div class="sr"><span class="c">Profit/km</span><span class="a">${fS(net/bizKm)}</span></div>`:'<p style="font-size:13px;color:var(--mut)">Classify trips first</p>'
+  const uI=incomes.filter(i=>i.platform==='Uber').reduce((s,e)=>s+e.total,0),lI=incomes.filter(i=>i.platform==='Lyft').reduce((s,e)=>s+e.total,0)
+  $('dash-plat').innerHTML=`<div class="sr"><span class="c">Uber</span><span class="a">${fS(uI)}</span></div><div class="sr"><span class="c">Lyft</span><span class="a">${fS(lI)}</span></div>`
+  const hT=trips.length>0,hI=incomes.length>0,hE=expenses.length>0,hV=vault.length>0,sc=[hT,hI,hE,hV].filter(Boolean).length
+  $('dash-audit').innerHTML=`<div style="font-size:13px;margin-bottom:8px">Score: <strong>${sc}/4</strong></div><div class="pb" style="height:12px"><div class="pf" style="width:${sc*25}%;background:${sc===4?'var(--grn)':sc>=2?'var(--amb)':'var(--red)'}"></div></div><div style="margin-top:10px;font-size:12px;color:var(--mut)">${hT?'&#10003;':'&#10007;'} Mileage (${trips.length})<br>${hI?'&#10003;':'&#10007;'} Income (${incomes.length})<br>${hE?'&#10003;':'&#10007;'} Expenses (${expenses.length})<br>${hV?'&#10003;':'&#10007;'} Vault (${vault.length})</div>`
+
+  // INCOME
+  $('inc-total').innerHTML=`<div class="mv grn" style="font-size:24px">${fS(totalIncome)}</div>`
+  $('inc-list').innerHTML=incomes.slice(0,30).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date}</div><div style="font-size:14px;font-weight:500">${e.platform}</div><div style="font-size:12px;color:var(--mut)">Earn:${fmt(e.earn)} Tips:${fmt(e.tips)}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--grn)">${fS(e.total)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('income',${e.id})">delete</button></div>`).join('')
+
+  // EXPENSES
+  const catT={};expenses.forEach(e=>{catT[e.category]=(catT[e.category]||0)+getBE(e)})
+  $('exp-cats').innerHTML=Object.entries(catT).sort((a,b)=>b[1]-a[1]).map(([c,a])=>`<div class="sr"><span class="c">${c}</span><span class="a">${fS(a)}</span></div>`).join('')+`<div class="tr"><span>Total</span><span>${fS(totalBizExp)}</span></div>`
+  $('exp-list').innerHTML=expenses.slice(0,30).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date} | ${e.alloc}</div><div style="font-size:14px;font-weight:500">${e.category}${e.desc?': '+e.desc:''}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--red)">${fS(e.amount)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('expenses',${e.id})">delete</button></div>`).join('')
+
+  // P&L
+  let pl='<div style="font-weight:600;font-size:13px;margin-bottom:6px">REVENUE</div>'
+  ;[['Uber',incomes.filter(i=>i.platform==='Uber').reduce((s,e)=>s+e.earn,0)],['Lyft',incomes.filter(i=>i.platform==='Lyft').reduce((s,e)=>s+e.earn,0)],['Tips',incomes.reduce((s,e)=>s+e.tips,0)],['Bonuses',incomes.reduce((s,e)=>s+e.bonus,0)]].forEach(([k,v])=>{if(v>0)pl+=`<div class="sr"><span class="c">${k}</span><span class="a">${fS(v)}</span></div>`})
+  pl+=`<div class="tr"><span>Revenue</span><span>${fS(totalIncome)}</span></div><div style="font-weight:600;font-size:13px;margin:12px 0 6px">EXPENSES</div>`
+  Object.entries(catT).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{pl+=`<div class="sr"><span class="c">${k}</span><span class="a">${fS(v)}</span></div>`})
+  pl+=`<div class="tr"><span>Expenses</span><span>${fS(totalBizExp)}</span></div><div class="tr" style="border-top-color:var(--grn)"><span>Net profit</span><span style="color:${net>=0?'var(--grn)':'var(--red)'}">${fS(net)}</span></div>`
+  $('pnl').innerHTML=pl
+
+  // CRA
+  const diff=Math.abs(cra-totalBizExp)
+  $('cra').innerHTML=`<div class="w2"><div class="${cra>=totalBizExp?'winner':'loser'}"><h4>CRA mileage</h4><div class="big">${fS(cra)}</div><p style="font-size:11px;color:var(--mut)">${bizKm.toFixed(0)} km</p></div><div class="${totalBizExp>=cra?'winner':'loser'}"><h4>Actual</h4><div class="big">${fS(totalBizExp)}</div></div></div><div class="card"><h3>Result</h3><p style="font-size:14px;font-weight:600;color:var(--grn)">Use: ${better}</p><p style="font-size:13px">Saves: ${fS(diff)} | Tax (~30%): ${fS(diff*.3)}</p></div>`
+
+  // SETTINGS
+  const autoP=totalKm>0?bizKm/totalKm:0,ov=O('settings').overridePct
+  $('app-info').innerHTML=`<div class="sr"><span class="c">Auto</span><span class="a">${(autoP*100).toFixed(1)}%</span></div><div class="sr"><span class="c">Override</span><span class="a">${ov?ov+'%':'Off'}</span></div><div class="sr" style="font-weight:600"><span class="c">Active</span><span class="a">${(bp*100).toFixed(1)}%</span></div>`
+
+  // AUDIT SCORE
+  $('audit-score').innerHTML=`<div style="text-align:center;padding:10px"><div style="font-size:48px;font-weight:700;color:${sc===4?'var(--grn)':sc>=2?'var(--amb)':'var(--red)'}">${sc*25}%</div><div style="font-size:13px;color:var(--mut)">CRA audit ready</div></div>`
+
+  renderVault()
+}
+
+// Init
+const td=new Date().toISOString().slice(0,10);$('m-date').value=td;$('i-date').value=td;$('e-date').value=td
+const ss=getSt();$('s-cp').value=ss.carPrice;$('s-cl').value=ss.carLife;$('s-yo').value=ss.yearsOwned;$('s-od').value=ss.odometer;$('s-r1').value=ss.rate1;$('s-r2').value=ss.rate2
+render()
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})
+</script>
+</body>
+</html>
