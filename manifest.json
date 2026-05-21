@@ -2,7 +2,7 @@
   "name": "Uber/Lyft Driver Tracker",
   "short_name": "RideTrack",
   "description": "CRA-compliant income, expense & mileage tracker for Canadian rideshare drivers",
-  "start_url": "/",
+  "start_url": "/RiderFA/",
   "display": "standalone",
   "background_color": "#4472C4",
   "theme_color": "#4472C4",
