@@ -14,10 +14,9 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;padding-bottom:72px}
 .header{background:var(--pri);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px}
 .header h1{font-size:18px;font-weight:600;flex:1}
-.header p{font-size:11px;opacity:.8}
 .ham{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px 8px;line-height:1}
 
-/* BOTTOM NAV (4 favorites) */
+/* BOTTOM NAV */
 .bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--brd);display:flex;z-index:100;padding:4px 0;padding-bottom:env(safe-area-inset-bottom,4px)}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0;cursor:pointer;color:var(--mut);font-size:10px;font-weight:500;transition:.2s;position:relative;border:none;background:none;font-family:inherit}
 .bnav-item.active{color:var(--pri)}
@@ -80,9 +79,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .track-bar .info strong{font-size:14px}
 .track-bar .stop-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
 
-/* TRIP CARD WITH CLASSIFY BUTTONS — now 4 buttons */
-.trip-card{background:var(--card);border-radius:var(--rad);padding:14px;margin-bottom:10px;box-shadow:var(--sh);border-left:4px solid var(--amb)}
+/* TRIP CARD */
+.trip-card{background:var(--card);border-radius:var(--rad);padding:14px;margin-bottom:10px;box-shadow:var(--sh);border-left:4px solid var(--amb);position:relative}
 .trip-card.classified{border-left-color:var(--grn);opacity:.7}
+.trip-card.selected{border:2px solid var(--pri);border-left:4px solid var(--pri)}
 .trip-card .tc-top{display:flex;justify-content:space-between;align-items:flex-start}
 .trip-card .tc-route{flex:1}
 .trip-card .tc-km{font-size:18px;font-weight:700;color:var(--pri);text-align:right}
@@ -90,6 +90,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .trip-card .tc-addr span{color:var(--mut);font-weight:400}
 .trip-card .tc-meta{font-size:11px;color:var(--mut);margin-top:4px}
 .trip-card .tc-btns{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-top:10px}
+.trip-card .tc-check{position:absolute;top:12px;left:-2px;width:22px;height:22px;accent-color:var(--pri);display:none}
+.trip-card.select-mode .tc-check{display:block}
 .tc-btn{padding:8px 2px;border:none;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;transition:.15s;text-align:center;line-height:1.2}
 .tc-btn:active{transform:scale(.95)}
 .tc-btn.personal{background:#f3e8ff;color:#7c3aed}
@@ -102,6 +104,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .cl-finding{background:#fff3e0;color:#e65100}
 .cl-passenger{background:#e8f5e9;color:#2e7d32}
 .cl-notdriving{background:#f1f3f4;color:#5f6368}
+
+/* BATCH SELECT BAR */
+.batch-bar{position:fixed;bottom:56px;left:0;right:0;background:var(--pri);color:#fff;padding:10px 16px;display:none;align-items:center;gap:8px;z-index:99;box-shadow:0 -2px 8px rgba(0,0,0,.15)}
+.batch-bar.show{display:flex}
+.batch-bar .bb-count{font-size:13px;font-weight:600;flex:1}
+.batch-bar .bb-btn{padding:8px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
+.bb-personal{background:#f3e8ff;color:#7c3aed}
+.bb-finding{background:#fff3e0;color:#e65100}
+.bb-passenger{background:#e8f5e9;color:#2e7d32}
+.bb-notdriving{background:#f1f3f4;color:#5f6368}
+
+/* SELECT MODE TOOLBAR */
+.sel-toolbar{display:none;align-items:center;gap:10px;padding:10px 16px;background:var(--ibg);border-radius:8px;margin-bottom:12px}
+.sel-toolbar.show{display:flex}
+.sel-toolbar label{font-size:13px;font-weight:500;flex:1}
+.sel-toolbar input[type=checkbox]{width:18px;height:18px;accent-color:var(--pri)}
+.sel-toolbar button{padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:var(--brd);color:var(--txt)}
 
 /* CAPTURE */
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -123,13 +142,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .ao .aot{font-size:14px;font-weight:600}
 .ao .aos{font-size:11px;color:var(--mut)}
 .ac{width:100%;padding:14px;border:none;border-radius:10px;background:var(--brd);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;font-family:inherit}
-
-/* STEP */
 .step{background:var(--ibg);border-radius:8px;padding:14px;margin-bottom:10px;border-left:3px solid var(--pri)}
 .step .sn{font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase}
 .step .st{font-size:14px;font-weight:600;margin:2px 0}
 .step .sb{font-size:13px;color:var(--mut);line-height:1.6}
-
 .rt-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--brd)}
 .rt-card{background:var(--ibg);border-radius:8px;padding:10px;margin-bottom:10px}
 .rt-card .meta{font-size:11px;color:var(--mut);margin-top:6px}
@@ -140,7 +156,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .vs div{background:var(--ibg);border-radius:8px;padding:10px;text-align:center}
 .vs .num{font-size:20px;font-weight:700;color:var(--pri)}
 .vs .lbl{font-size:10px;color:var(--mut)}
-.wb{background:#fff3e0;border-radius:8px;padding:12px;font-size:12px;color:#e65100;margin-bottom:12px}
 .w2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .w2 div{border-radius:8px;padding:14px;text-align:center}
 .winner{background:#e8f5e9;border:2px solid var(--grn)}
@@ -152,31 +167,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </head>
 <body>
 
-<!-- PERSISTENT TRACKING BAR -->
+<!-- TRACKING BAR -->
 <div class="track-bar" id="track-bar" onclick="navTo('trips')">
   <div class="dot"></div>
-  <div class="info"><strong id="bar-km">0.0 km</strong> &middot; <span id="bar-time">0:00</span> &middot; Tracking active</div>
+  <div class="info"><strong id="bar-km">0.0 km</strong> &middot; <span id="bar-time">0:00</span> &middot; Tracking</div>
   <button class="stop-btn" onclick="event.stopPropagation();stopAutoTrack()">Stop</button>
 </div>
 
 <div class="header">
-  <button class="ham" id="ham-btn" onclick="toggleMenu()">&#9776;</button>
+  <button class="ham" onclick="toggleMenu()">&#9776;</button>
   <h1>RideTrack</h1>
-  <p style="position:absolute;right:16px;font-size:10px;opacity:.7">v2.0</p>
+  <span style="font-size:10px;opacity:.6">v3.0</span>
 </div>
 
-<!-- SLIDE-OUT MENU -->
+<!-- MENU -->
 <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
 <div class="menu-panel" id="menu-panel">
   <div class="menu-head"><h2>RideTrack</h2><p>CRA-Compliant Tracker</p></div>
   <div id="menu-items"></div>
   <div class="menu-sep"></div>
-  <div style="padding:12px 20px;font-size:11px;color:var(--mut)">Tap &#9733; to add/remove favorites from bottom bar (max 4)</div>
+  <div style="padding:12px 20px;font-size:11px;color:var(--mut)">Tap &#9733; to add/remove favorites (max 4)</div>
 </div>
 
-<!-- ALL PAGES -->
+<!-- PAGES -->
 <div class="page active" id="page-trips">
   <div class="card" id="unclassified-header"></div>
+  <div class="sel-toolbar" id="sel-toolbar">
+    <input type="checkbox" id="sel-all" onchange="toggleSelectAll()">
+    <label for="sel-all" id="sel-count">Select all</label>
+    <button onclick="exitSelectMode()">Cancel</button>
+  </div>
   <div id="unclassified-list"></div>
   <div class="card" style="margin-top:16px"><h3>Recently classified</h3><div id="classified-list"></div></div>
 </div>
@@ -184,11 +204,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="page" id="page-track">
   <div class="card" style="text-align:center">
     <h3>Auto-tracking</h3>
-    <p style="font-size:13px;color:var(--mut);margin-bottom:16px">Detects driving (>10 km/h) and auto-logs each trip. Pulls over for 30+ sec = trip ends. Traffic light pauses are ignored.</p>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:16px">Detects driving (>15 km/h sustained). Trips end after 5 min stopped (like MileIQ). Traffic lights are never counted as trip ends.</p>
     <button class="btn bp" id="auto-toggle" onclick="toggleAutoTrack()" style="font-size:16px;padding:16px">Enable auto-tracking</button>
     <div id="track-stats" style="margin-top:16px"></div>
   </div>
-  <div class="ib">Keep this app open (switch to Uber/Lyft as normal). Tracking survives app-switching. Only the Stop button stops it.</div>
+  <div class="ib">For true background tracking (app fully closed), install the native Android version. See Settings > Native App for instructions.</div>
   <div class="card"><h3>Today's summary</h3><div id="today-summary"></div></div>
   <div class="card">
     <h3>Manual trip entry</h3>
@@ -251,7 +271,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 
 <div class="page" id="page-capture">
-  <div class="ib">Tap any button below. Choose to snap a photo or upload a file (screenshot, PDF, email receipt).</div>
+  <div class="ib">Tap any button below. Choose to snap a photo or upload a file.</div>
   <div class="cg">
     <div class="cb" onclick="openSheet('income-uber','Uber pay','Snap or upload Uber earnings')"><div class="ci">&#128663;</div><div class="cl2">Uber pay</div><div class="cd">Snap / upload</div></div>
     <div class="cb" onclick="openSheet('income-lyft','Lyft pay','Snap or upload Lyft earnings')"><div class="ci">&#128660;</div><div class="cl2">Lyft pay</div><div class="cd">Snap / upload</div></div>
@@ -264,7 +284,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <input type="file" accept="image/*,application/pdf" id="gal-in" class="fi" onchange="handleCap(event)">
   <div class="aso" id="cap-sheet" onclick="closeSheet(event)"><div class="ash">
     <h4 id="sh-title">Capture</h4><p id="sh-desc">Choose method</p>
-    <button class="ao" onclick="doCap('cam')"><div class="aoi">&#128247;</div><div><div class="aot">Take photo</div><div class="aos">Camera for paper receipts or screen</div></div></button>
+    <button class="ao" onclick="doCap('cam')"><div class="aoi">&#128247;</div><div><div class="aot">Take photo</div><div class="aos">Camera for paper receipts</div></div></button>
     <button class="ao" onclick="doCap('gal')"><div class="aoi">&#128193;</div><div><div class="aot">Upload file</div><div class="aos">Screenshot, PDF, or saved image</div></div></button>
     <button class="ac" onclick="closeSheet()">Cancel</button>
   </div></div>
@@ -293,10 +313,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="step"><div class="sn">Step 1</div><div class="st">Get your annual summary</div><div class="sb">Uber/Lyft email you a tax summary in Jan/Feb. This is NOT a T4 — rideshare is self-employment.</div></div>
     <div class="step"><div class="sn">Step 2</div><div class="st">Use free tax software</div><div class="sb">Wealthsimple Tax (free) or StudioTax. Both are CRA NETFILE certified.</div></div>
     <div class="step"><div class="sn">Step 3</div><div class="st">Add Form T2125</div><div class="sb">Industry code: 485310 (Rideshare). Enter your total income from this app's Dashboard.</div></div>
-    <div class="step"><div class="sn">Step 4</div><div class="st">Enter vehicle expenses</div><div class="sb">Use the CRA tab to see which method (mileage rate vs actual) gives bigger deduction. Enter all categories from P&L.</div></div>
-    <div class="step"><div class="sn">Step 5</div><div class="st">CCA for your car</div><div class="sb">Class 10 or 10.1 (if >$38K). Software calculates it — enter purchase price and business start date.</div></div>
+    <div class="step"><div class="sn">Step 4</div><div class="st">Enter vehicle expenses</div><div class="sb">Use the CRA tab to see which method (mileage rate vs actual) gives bigger deduction.</div></div>
+    <div class="step"><div class="sn">Step 5</div><div class="st">CCA for your car</div><div class="sb">Class 10 or 10.1 (if >$38K). Enter purchase price and business start date.</div></div>
     <div class="step"><div class="sn">Step 6</div><div class="st">HST/GST</div><div class="sb">Register if income >$30K in 4 consecutive quarters. Below that it's optional.</div></div>
-    <div class="step"><div class="sn">Step 7</div><div class="st">Keep records 6 years</div><div class="sb">CRA requires 6 years of records. Your Vault captures + data exports are your evidence. Back up regularly!</div></div>
+    <div class="step"><div class="sn">Step 7</div><div class="st">Keep records 6 years</div><div class="sb">CRA requires 6 years. Your Vault + data exports are evidence.</div></div>
   </div>
   <div class="card"><h3>Audit readiness</h3><div id="audit-score"></div></div>
 </div>
@@ -307,14 +327,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div id="app-info"></div>
     <div class="fg" style="margin-top:12px"><label>Manual override %</label><input type="number" id="s-ov" step="0.1" min="0" max="100" placeholder="Blank = auto"></div>
     <button class="btn bp" onclick="saveOv()">Save</button>
-    <button class="btn" style="background:var(--brd);margin-top:8px" onclick="clearOv()">Clear override</button>
-  </div>
-  <div class="card">
-    <h3>Trip detection</h3>
-    <div class="si"><label>Start speed (km/h)</label><input type="number" id="s-ss" value="10" step="1"></div>
-    <div class="si"><label>Stop timeout (sec)</label><input type="number" id="s-st" value="30" step="5"></div>
-    <p style="font-size:11px;color:var(--mut);margin-top:8px">Lower timeout = more sensitive trip splitting. 30s works well for rideshare. Traffic pauses under 10s are always ignored.</p>
-    <button class="btn bp" style="margin-top:12px" onclick="saveTripSettings()">Save</button>
+    <button class="btn" style="background:var(--brd);margin-top:8px" onclick="clearOv()">Clear</button>
   </div>
   <div class="card">
     <h3>Vehicle</h3>
@@ -333,21 +346,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="card">
     <h3>Data</h3>
     <button class="btn be" onclick="exportAll()">Full backup (JSON)</button>
-    <div class="fg" style="margin-top:12px"><label>Restore from backup</label><input type="file" id="imp" accept=".json" onchange="importD(event)"></div>
-    <button class="btn bd" style="width:100%;margin-top:12px" onclick="if(confirm('DELETE ALL DATA? This cannot be undone!')){localStorage.clear();location.reload()}">Reset all data</button>
+    <div class="fg" style="margin-top:12px"><label>Restore</label><input type="file" id="imp" accept=".json" onchange="importD(event)"></div>
+    <button class="btn bd" style="width:100%;margin-top:12px" onclick="if(confirm('DELETE ALL DATA?')){localStorage.clear();location.reload()}">Reset all data</button>
   </div>
 </div>
 
 <!-- BOTTOM NAV -->
 <nav class="bnav" id="bnav"></nav>
 
+<!-- BATCH CLASSIFY BAR -->
+<div class="batch-bar" id="batch-bar">
+  <span class="bb-count" id="bb-count">0 selected</span>
+  <button class="bb-btn bb-personal" onclick="batchClassify('personal')">Personal</button>
+  <button class="bb-btn bb-finding" onclick="batchClassify('finding')">Finding</button>
+  <button class="bb-btn bb-passenger" onclick="batchClassify('passenger')">Passenger</button>
+  <button class="bb-btn bb-notdriving" onclick="batchClassify('notdriving')">Not driving</button>
+</div>
+
 <script>
-// ===== DATA LAYER (same keys — preserves all existing data) =====
+// ===== DATA (same localStorage keys — all existing data preserved) =====
 const D=(k,v)=>{if(v===undefined){try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}}localStorage.setItem(k,JSON.stringify(v))};
 const O=(k,v)=>{if(v===undefined){try{return JSON.parse(localStorage.getItem(k))||{}}catch{return{}}}localStorage.setItem(k,JSON.stringify(v))};
 const $=id=>document.getElementById(id);
 
-// ===== ALL PAGES CONFIG =====
+// ===== PAGES =====
 const PAGES=[
   {id:'trips',icon:'&#128203;',label:'Trips'},
   {id:'track',icon:'&#128205;',label:'Track'},
@@ -362,51 +384,31 @@ const PAGES=[
   {id:'settings',icon:'&#9881;',label:'Settings'}
 ];
 const DEFAULT_FAVS=['trips','track','dashboard','capture'];
-
-function getFavs(){
-  const s=O('settings');
-  return s.favs||DEFAULT_FAVS;
-}
+function getFavs(){return O('settings').favs||DEFAULT_FAVS}
 function setFavs(f){const s=O('settings');s.favs=f;O('settings',s)}
 
 let currentPage='trips';
 
-// ===== NAV =====
 function navTo(pg){
   currentPage=pg;
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   $('page-'+pg).classList.add('active');
   renderNav();render();
-  // close menu if open
-  $('menu-overlay').classList.remove('open');
-  $('menu-panel').classList.remove('open');
+  $('menu-overlay').classList.remove('open');$('menu-panel').classList.remove('open');
 }
-
-function toggleMenu(){
-  $('menu-overlay').classList.toggle('open');
-  $('menu-panel').classList.toggle('open');
-  renderMenu();
-}
-
+function toggleMenu(){$('menu-overlay').classList.toggle('open');$('menu-panel').classList.toggle('open');renderMenu()}
 function toggleFav(id){
   let f=getFavs();
-  if(f.includes(id)){f=f.filter(x=>x!==id)}
-  else{if(f.length>=4){alert('Max 4 favorites. Remove one first.');return}f.push(id)}
+  if(f.includes(id))f=f.filter(x=>x!==id);
+  else{if(f.length>=4){alert('Max 4. Remove one first.');return}f.push(id)}
   setFavs(f);renderMenu();renderNav()
 }
-
 function renderMenu(){
   const favs=getFavs();
-  $('menu-items').innerHTML=PAGES.map(p=>`
-    <button class="mi ${currentPage===p.id?'active':''}" onclick="navTo('${p.id}')">
-      <span class="mi-icon">${p.icon}</span>${p.label}
-      <span class="mi-star ${favs.includes(p.id)?'fav':''}" onclick="event.stopPropagation();toggleFav('${p.id}')">${favs.includes(p.id)?'&#9733;':'&#9734;'}</span>
-    </button>`).join('')
+  $('menu-items').innerHTML=PAGES.map(p=>`<button class="mi ${currentPage===p.id?'active':''}" onclick="navTo('${p.id}')"><span class="mi-icon">${p.icon}</span>${p.label}<span class="mi-star ${favs.includes(p.id)?'fav':''}" onclick="event.stopPropagation();toggleFav('${p.id}')">${favs.includes(p.id)?'&#9733;':'&#9734;'}</span></button>`).join('')
 }
-
 function renderNav(){
-  const favs=getFavs();
-  const unc=D('trips').filter(t=>t.type==='unclassified').length;
+  const favs=getFavs(),unc=D('trips').filter(t=>t.type==='unclassified').length;
   $('bnav').innerHTML=favs.map(fid=>{
     const p=PAGES.find(x=>x.id===fid);if(!p)return'';
     const badge=(fid==='trips'&&unc>0)?`<span class="badge">${unc}</span>`:'';
@@ -414,19 +416,16 @@ function renderNav(){
   }).join('')
 }
 
-// ===== AUTO GPS TRACKING — IMPROVED =====
+// ===== GPS TRACKING — MileIQ-style (5-min timeout, 15km/h driving threshold) =====
 let autoTrack=false, watchId=null, curTrip=null, tripTimer=null, stopTimeout=null, wakeLock=null
 let lastMovingTime=0, lastGPSTime=0
+const DRIVE_SPEED=15/3.6  // 15 km/h = definite driving (not walking/running)
+const STOP_MS=300000       // 5 minutes = trip end (like MileIQ)
 
-function getSpeedThresh(){const s=O('settings');return(s.startSpeed||10)/3.6}
-function getStopTime(){const s=O('settings');return(s.stopTimeout||30)*1000}
-
-function toggleAutoTrack(){
-  if(autoTrack) stopAutoTrack(); else startAutoTrack()
-}
+function toggleAutoTrack(){if(autoTrack)stopAutoTrack();else startAutoTrack()}
 
 function startAutoTrack(){
-  if(!navigator.geolocation)return alert('GPS not available on this device')
+  if(!navigator.geolocation)return alert('GPS not available')
   autoTrack=true
   localStorage.setItem('autoTrackOn','1')
   $('auto-toggle').textContent='Disable auto-tracking'
@@ -434,16 +433,14 @@ function startAutoTrack(){
   $('track-bar').classList.add('active')
   acquireWakeLock()
   startGPS()
-  
   tripTimer=setInterval(()=>{
     if(curTrip){
       const el=Math.floor((Date.now()-curTrip.startTime)/1000)
       $('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)
     }
-    // KEEPALIVE: if GPS went silent >15s, restart it
-    if(autoTrack && Date.now()-lastGPSTime>15000){
-      console.log('GPS keepalive — restarting watchPosition')
-      if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(e){}}
+    // Keepalive: restart GPS if silent >20s
+    if(autoTrack&&Date.now()-lastGPSTime>20000){
+      if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){}
       startGPS()
     }
   },1000)
@@ -451,25 +448,25 @@ function startAutoTrack(){
 
 function startGPS(){
   watchId=navigator.geolocation.watchPosition(onGPS,err=>{
-    console.log('GPS err',err.code,err.message)
-    // DON'T stop tracking on error — just retry
-    if(autoTrack){
-      setTimeout(()=>{if(autoTrack)startGPS()},3000)
-    }
-  },{enableHighAccuracy:true,maximumAge:2000,timeout:10000})
+    // Never give up — keep retrying
+    if(autoTrack)setTimeout(()=>{if(autoTrack)startGPS()},5000)
+  },{enableHighAccuracy:true,maximumAge:3000,timeout:15000})
 }
 
 function onGPS(pos){
   lastGPSTime=Date.now()
   const speed=pos.coords.speed!=null?pos.coords.speed:0
-  const pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now(),speed}
-  const SPEED_THRESH=getSpeedThresh()
-  const STOP_MS=getStopTime()
+  const acc=pos.coords.accuracy||999
+  const pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now(),speed,acc}
   
-  if(!curTrip && speed>=SPEED_THRESH){
-    // === START NEW TRIP ===
+  // Ignore very inaccurate readings (>50m)
+  if(acc>50)return
+  
+  if(!curTrip&&speed>=DRIVE_SPEED){
+    // === START TRIP (driving speed detected) ===
     curTrip={id:Date.now(),startTime:Date.now(),points:[pt],startLat:pt.lat,startLng:pt.lng,dist:0,moving:true}
     lastMovingTime=Date.now()
+    // Get precise start address (zoom 18 = house number level)
     reverseGeo(pt.lat,pt.lng).then(a=>{if(curTrip)curTrip.startAddr=a})
     if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
   } else if(curTrip){
@@ -479,37 +476,30 @@ function onGPS(pos){
     if(d>0.005){curTrip.dist+=d;curTrip.points.push(pt)}
     curTrip.endLat=pt.lat;curTrip.endLng=pt.lng
     
-    if(speed>=SPEED_THRESH){
-      // Moving at driving speed — trip continues
+    if(speed>=DRIVE_SPEED){
+      // Driving — trip continues, cancel any stop timer
       curTrip.moving=true
       lastMovingTime=Date.now()
       if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
-    } else if(speed<1.5){
-      // Nearly stopped (< ~5 km/h)
+    } else if(speed<2){
+      // Fully stopped (<7 km/h)
       if(curTrip.moving){
         curTrip.moving=false
-        // Start stop timer ONLY if we haven't already
+        // Start 5-min stop timer
         if(!stopTimeout){
           stopTimeout=setTimeout(()=>{
-            // Check: still not moving after timeout?
-            if(curTrip && !curTrip.moving && (Date.now()-lastMovingTime)>=STOP_MS){
+            if(curTrip&&!curTrip.moving&&(Date.now()-lastMovingTime)>=STOP_MS){
               finishTrip()
             }
             stopTimeout=null
-          }, STOP_MS)
+          },STOP_MS)
         }
       }
     } else {
-      // Slow speed (5-10 km/h creep) — traffic crawl, DON'T end trip
-      // But don't reset stop timer either — this is ambiguous
-      // If we were stopped and now creeping, that's traffic resuming
-      if(!curTrip.moving){
-        curTrip.moving=true
-        lastMovingTime=Date.now()
-        if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
-      }
+      // Slow movement (7-15 km/h) — could be parking lot, traffic crawl
+      // DON'T end trip, DON'T reset timer — just observe
+      // If speed picks back up above DRIVE_SPEED, stop timer gets cleared above
     }
-    // Update tracking bar
     $('bar-km').textContent=curTrip.dist.toFixed(1)+' km'
     const el=Math.floor((Date.now()-curTrip.startTime)/1000)
     $('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)
@@ -517,10 +507,11 @@ function onGPS(pos){
 }
 
 function stopAutoTrack(){
-  if(curTrip) finishTrip()
+  if(curTrip)finishTrip()
   autoTrack=false
   localStorage.removeItem('autoTrackOn')
-  if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(e){};watchId=null}
+  if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){}
+  watchId=null
   if(tripTimer){clearInterval(tripTimer);tripTimer=null}
   if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
   releaseWakeLock()
@@ -532,7 +523,7 @@ function stopAutoTrack(){
 }
 
 function finishTrip(){
-  if(!curTrip||curTrip.dist<0.05)return curTrip=null  // ignore <50m trips (GPS noise)
+  if(!curTrip||curTrip.dist<0.1){curTrip=null;return}
   const trip={
     id:curTrip.id,
     date:new Date(curTrip.startTime).toISOString().slice(0,10),
@@ -545,7 +536,7 @@ function finishTrip(){
     type:'unclassified',
     gps:true
   }
-  if(curTrip.endLat) reverseGeo(curTrip.endLat,curTrip.endLng).then(a=>{
+  if(curTrip.endLat)reverseGeo(curTrip.endLat,curTrip.endLng).then(a=>{
     const trips=D('trips');const t=trips.find(x=>x.id===trip.id);if(t){t.endAddr=a;D('trips',trips);render()}
   })
   const trips=D('trips');trips.unshift(trip);D('trips',trips)
@@ -555,58 +546,88 @@ function finishTrip(){
   render()
 }
 
-// ===== WAKE LOCK — persistent, re-acquires on focus =====
-async function acquireWakeLock(){
-  if(!('wakeLock' in navigator))return
-  try{wakeLock=await navigator.wakeLock.request('screen')}catch(e){}
-}
-function releaseWakeLock(){
-  if(wakeLock){try{wakeLock.release()}catch(e){};wakeLock=null}
-}
-
-// Re-acquire wake lock when tab becomes visible again
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible' && autoTrack){
-    acquireWakeLock()
-    // Also check if GPS is still alive
-    if(Date.now()-lastGPSTime>10000 && autoTrack){
-      if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(e){}}
-      startGPS()
-    }
-  }
-})
-
-// Auto-resume tracking if it was on before page reload/close
-window.addEventListener('load',()=>{
-  if(localStorage.getItem('autoTrackOn')==='1'){
-    startAutoTrack()
-  }
-})
-
-// Reverse geocoding (free, no API key)
+// ===== PRECISE ADDRESS (zoom=18 gives house numbers) =====
 async function reverseGeo(lat,lng){
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=16`)
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&addressdetails=1`)
     const d=await r.json()
     const a=d.address
-    return a.road||a.pedestrian||a.suburb||a.city||a.town||'Unknown'
+    // Build precise address: house_number + road + city
+    let addr=''
+    if(a.house_number)addr+=a.house_number+' '
+    addr+=a.road||a.pedestrian||a.cycleway||''
+    if(a.suburb&&!(a.road||'').includes(a.suburb))addr+=(addr?', ':'')+a.suburb
+    if(a.city||a.town||a.village)addr+=(addr?', ':'')+(a.city||a.town||a.village)
+    return addr||d.display_name||'Unknown'
   }catch{return''}
 }
 
 function hav(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 
-// ===== CLASSIFY TRIP (now includes 'notdriving') =====
+// ===== WAKE LOCK =====
+async function acquireWakeLock(){if(!('wakeLock' in navigator))return;try{wakeLock=await navigator.wakeLock.request('screen')}catch(e){}}
+function releaseWakeLock(){if(wakeLock){try{wakeLock.release()}catch(e){};wakeLock=null}}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&autoTrack){
+    acquireWakeLock()
+    if(Date.now()-lastGPSTime>15000){if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){};startGPS()}
+  }
+})
+// Auto-resume on page load
+window.addEventListener('load',()=>{if(localStorage.getItem('autoTrackOn')==='1')startAutoTrack()})
+
+// ===== BATCH SELECT =====
+let selectMode=false, selected=new Set()
+
+function enterSelectMode(){
+  selectMode=true;selected.clear();render()
+}
+function exitSelectMode(){
+  selectMode=false;selected.clear();
+  $('batch-bar').classList.remove('show');$('sel-toolbar').classList.remove('show')
+  render()
+}
+function toggleSelect(id){
+  if(selected.has(id))selected.delete(id);else selected.add(id)
+  updateSelectUI()
+}
+function toggleSelectAll(){
+  const unc=D('trips').filter(t=>t.type==='unclassified')
+  if(selected.size===unc.length){selected.clear()}
+  else{unc.forEach(t=>selected.add(t.id))}
+  updateSelectUI();render()
+}
+function updateSelectUI(){
+  $('bb-count').textContent=selected.size+' selected'
+  $('sel-count').textContent=selected.size>0?selected.size+' selected':'Select all'
+  $('sel-all').checked=selected.size===D('trips').filter(t=>t.type==='unclassified').length
+  if(selected.size>0)$('batch-bar').classList.add('show');else $('batch-bar').classList.remove('show')
+}
+function batchClassify(type){
+  if(selected.size===0)return
+  const trips=D('trips')
+  selected.forEach(id=>{
+    const t=trips.find(x=>x.id===id)
+    if(t){
+      t.type=type
+      if(type==='personal'||type==='notdriving'){t.bizKm=0;t.persKm=type==='personal'?t.totalKm:0}
+      else{t.bizKm=t.totalKm;t.persKm=0}
+    }
+  })
+  D('trips',trips)
+  exitSelectMode()
+}
+
+// ===== CLASSIFY SINGLE =====
 function classifyTrip(id,type){
   const trips=D('trips'),t=trips.find(x=>x.id===id)
   if(!t)return
   t.type=type
   if(type==='personal'||type==='notdriving'){t.bizKm=0;t.persKm=type==='personal'?t.totalKm:0}
   else{t.bizKm=t.totalKm;t.persKm=0}
-  D('trips',trips)
-  render()
+  D('trips',trips);render()
 }
-
-function deleteTrip(id){if(!confirm('Delete this trip?'))return;D('trips',D('trips').filter(t=>t.id!==id));render()}
+function deleteTrip(id){if(!confirm('Delete?'))return;D('trips',D('trips').filter(t=>t.id!==id));render()}
 
 // ===== MANUAL TRIP =====
 function addManualTrip(){
@@ -614,8 +635,7 @@ function addManualTrip(){
   if(!d||!km||km<=0)return alert('Fill date and km')
   const trip={id:Date.now(),date:d,time:'',endTime:'',totalKm:km,duration:0,startAddr:'Manual',endAddr:'',type,gps:false,
     bizKm:type==='personal'||type==='notdriving'?0:(type==='unclassified'?0:km),persKm:type==='personal'?km:0,notes:$('m-notes').value}
-  const trips=D('trips');trips.unshift(trip);D('trips',trips)
-  $('m-km').value='';$('m-notes').value='';render()
+  D('trips',[trip,...D('trips')]);$('m-km').value='';$('m-notes').value='';render()
 }
 
 // ===== INCOME/EXPENSE =====
@@ -665,16 +685,15 @@ function renderVault(){
 // ===== SETTINGS =====
 function saveOv(){const v=$('s-ov').value,s=O('settings');s.overridePct=v?parseFloat(v):null;O('settings',s);render()}
 function clearOv(){const s=O('settings');s.overridePct=null;O('settings',s);$('s-ov').value='';render()}
-function saveTripSettings(){const s=O('settings');s.startSpeed=parseFloat($('s-ss').value)||10;s.stopTimeout=parseFloat($('s-st').value)||30;O('settings',s);alert('Trip detection updated!')}
 function saveCar(){const s=O('settings');s.carPrice=parseFloat($('s-cp').value)||28500;s.carLife=parseFloat($('s-cl').value)||7;s.yearsOwned=parseFloat($('s-yo').value)||1;s.odometer=parseFloat($('s-od').value)||67450;O('settings',s);alert('Saved!');render()}
 function saveCRA(){const s=O('settings');s.rate1=parseFloat($('s-r1').value)||.72;s.rate2=parseFloat($('s-r2').value)||.66;O('settings',s);alert('Saved!');render()}
 function exportAll(){const a={trips:D('trips'),income:D('income'),expenses:D('expenses'),vault:D('vault'),settings:O('settings')};dl('ridetrack_backup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(a),'application/json')}
 function exportVault(){const d=D('vault');if(!d.length)return alert('Empty');dl('vault_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(d),'application/json')}
-function importD(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.trips)D('trips',d.trips);if(d.income)D('income',d.income);if(d.expenses)D('expenses',d.expenses);if(d.vault)D('vault',d.vault);if(d.settings)O('settings',d.settings);alert('Restored!');render()}catch{alert('Invalid file')}};r.readAsText(f)}
+function importD(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.trips)D('trips',d.trips);if(d.income)D('income',d.income);if(d.expenses)D('expenses',d.expenses);if(d.vault)D('vault',d.vault);if(d.settings)O('settings',d.settings);alert('Restored!');render()}catch{alert('Invalid')}};r.readAsText(f)}
 function dl(n,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click()}
 
 // ===== CALCS =====
-function getSt(){return Object.assign({carPrice:28500,carLife:7,yearsOwned:1.75,rate1:.72,rate2:.66,odometer:67450,startSpeed:10,stopTimeout:30},O('settings'))}
+function getSt(){return Object.assign({carPrice:28500,carLife:7,yearsOwned:1.75,rate1:.72,rate2:.66,odometer:67450},O('settings'))}
 function getBP(){const o=O('settings').overridePct;if(o!=null&&o!=='')return o/100;const t=D('trips').filter(x=>x.type!=='unclassified'&&x.type!=='notdriving'),tk=t.reduce((s,x)=>s+x.totalKm,0),bk=t.reduce((s,x)=>s+(x.bizKm||0),0);return tk>0?bk/tk:0}
 function getBE(e){if(e.alloc==='Fully Business')return e.amount;if(e.alloc==='Fully Personal')return 0;return e.amount*getBP()}
 function fmt(n){return'$'+Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
@@ -685,23 +704,26 @@ function render(){
   const trips=D('trips'),incomes=D('income').sort((a,b)=>b.date.localeCompare(a.date)),expenses=D('expenses').sort((a,b)=>b.date.localeCompare(a.date))
   const vault=D('vault'),st=getSt(),bp=getBP()
   const classified=trips.filter(t=>t.type!=='unclassified'),unclassified=trips.filter(t=>t.type==='unclassified')
-  // Exclude notdriving from km totals
   const kmTrips=classified.filter(t=>t.type!=='notdriving')
   const totalKm=kmTrips.reduce((s,t)=>s+t.totalKm,0),bizKm=kmTrips.reduce((s,t)=>s+(t.bizKm||0),0)
   const totalIncome=incomes.reduce((s,e)=>s+e.total,0),totalBizExp=expenses.reduce((s,e)=>s+getBE(e),0),net=totalIncome-totalBizExp
   const r1=st.rate1||.72,r2=st.rate2||.66,cra=bizKm<=5000?bizKm*r1:5000*r1+(bizKm-5000)*r2
   const better=cra>totalBizExp?'CRA Mileage':(totalBizExp>cra?'Actual':'Equal')
-
-  // Update bottom nav badge
   renderNav()
 
-  // TRIPS PAGE
+  // TRIPS
+  const selClass=selectMode?' select-mode':''
   $('unclassified-header').innerHTML=unclassified.length?
-    `<h3>Classify ${unclassified.length} trip${unclassified.length>1?'s':''}</h3><p style="font-size:12px;color:var(--mut)">Tap a button on each trip to categorize it</p>`
-    :`<h3>All caught up!</h3><p style="font-size:12px;color:var(--mut)">No unclassified trips. Enable auto-tracking in the Track tab.</p>`
+    `<h3>Classify ${unclassified.length} trip${unclassified.length>1?'s':''}</h3><div style="display:flex;gap:8px;align-items:center"><p style="font-size:12px;color:var(--mut);flex:1">Tap buttons or use batch select</p><button style="background:var(--pri);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer" onclick="enterSelectMode()">Select</button></div>`
+    :`<h3>All caught up!</h3><p style="font-size:12px;color:var(--mut)">No unclassified trips.</p>`
   
-  $('unclassified-list').innerHTML=unclassified.sort((a,b)=>b.id-a.id).slice(0,50).map(t=>`
-    <div class="trip-card">
+  if(selectMode){$('sel-toolbar').classList.add('show');updateSelectUI()}
+  else{$('sel-toolbar').classList.remove('show');$('batch-bar').classList.remove('show')}
+
+  $('unclassified-list').innerHTML=unclassified.sort((a,b)=>b.id-a.id).slice(0,50).map(t=>{
+    const isSelected=selected.has(t.id)
+    return`<div class="trip-card${selClass}${isSelected?' selected':''}" ${selectMode?`onclick="toggleSelect(${t.id});render()"`:''}> 
+      <input type="checkbox" class="tc-check" ${isSelected?'checked':''} onclick="event.stopPropagation();toggleSelect(${t.id});render()">
       <div class="tc-top">
         <div class="tc-route">
           <div class="tc-addr">${t.startAddr||'Start'} <span>&#8594;</span> ${t.endAddr||'End'}</div>
@@ -709,13 +731,13 @@ function render(){
         </div>
         <div class="tc-km">${t.totalKm.toFixed(1)} km</div>
       </div>
-      <div class="tc-btns">
+      ${selectMode?'':`<div class="tc-btns">
         <button class="tc-btn personal" onclick="classifyTrip(${t.id},'personal')"><span class="tc-icon">&#128100;</span>Personal</button>
         <button class="tc-btn finding" onclick="classifyTrip(${t.id},'finding')"><span class="tc-icon">&#128269;</span>Finding</button>
         <button class="tc-btn passenger" onclick="classifyTrip(${t.id},'passenger')"><span class="tc-icon">&#128176;</span>Passenger</button>
         <button class="tc-btn notdriving" onclick="classifyTrip(${t.id},'notdriving')"><span class="tc-icon">&#128683;</span>Not driving</button>
-      </div>
-    </div>`).join('')
+      </div>`}
+    </div>`}).join('')
 
   $('classified-list').innerHTML=classified.sort((a,b)=>b.id-a.id).slice(0,20).map(t=>{
     const cls=t.type==='personal'?'cl-personal':t.type==='finding'?'cl-finding':t.type==='notdriving'?'cl-notdriving':'cl-passenger'
@@ -724,42 +746,30 @@ function render(){
     return`<div class="trip-card classified" style="border-left-color:${col}">
       <div class="tc-top"><div class="tc-route"><div class="tc-addr">${t.startAddr||'Start'} <span>&#8594;</span> ${t.endAddr||'End'}</div><div class="tc-meta">${t.date} | ${t.totalKm.toFixed(1)} km</div></div><div class="tc-km">${t.totalKm.toFixed(1)}</div></div>
       <span class="classified-label ${cls}">${lbl}</span>
-      <button style="background:none;border:none;color:var(--red);font-size:11px;float:right;margin-top:-20px;cursor:pointer" onclick="deleteTrip(${t.id})">delete</button>
-    </div>`
-  }).join('')||'<p style="font-size:13px;color:var(--mut)">No classified trips yet</p>'
+      <button style="background:none;border:none;color:var(--red);font-size:11px;float:right;margin-top:-20px;cursor:pointer" onclick="deleteTrip(${t.id})">del</button>
+    </div>`}).join('')||'<p style="font-size:13px;color:var(--mut)">No classified trips yet</p>'
 
-  // TRACK PAGE
-  const today=new Date().toISOString().slice(0,10)
-  const todayT=trips.filter(t=>t.date===today)
-  $('today-summary').innerHTML=`
-    <div class="sr"><span class="c">Trips today</span><span class="a">${todayT.length}</span></div>
-    <div class="sr"><span class="c">KM today</span><span class="a">${todayT.reduce((s,t)=>s+t.totalKm,0).toFixed(1)}</span></div>
-    <div class="sr"><span class="c">Unclassified</span><span class="a">${todayT.filter(t=>t.type==='unclassified').length}</span></div>`
-  $('track-stats').innerHTML=autoTrack?`<p style="font-size:13px;color:var(--grn);font-weight:600">Tracking active${curTrip?' — on a trip':' — waiting for movement'}</p>`
-    :`<p style="font-size:13px;color:var(--mut)">Tracking is off</p>`
+  // TRACK
+  const today=new Date().toISOString().slice(0,10),todayT=trips.filter(t=>t.date===today)
+  $('today-summary').innerHTML=`<div class="sr"><span class="c">Trips today</span><span class="a">${todayT.length}</span></div><div class="sr"><span class="c">KM today</span><span class="a">${todayT.reduce((s,t)=>s+t.totalKm,0).toFixed(1)}</span></div><div class="sr"><span class="c">Unclassified</span><span class="a">${todayT.filter(t=>t.type==='unclassified').length}</span></div>`
+  $('track-stats').innerHTML=autoTrack?`<p style="font-size:13px;color:var(--grn);font-weight:600">Tracking active${curTrip?' — on a trip':' — waiting for driving speed'}</p>`:`<p style="font-size:13px;color:var(--mut)">Tracking is off</p>`
 
   // DASHBOARD
-  $('dash-metrics').innerHTML=`
-    <div class="met"><div class="ml">YTD income</div><div class="mv grn">${fS(totalIncome)}</div></div>
-    <div class="met"><div class="ml">YTD expenses</div><div class="mv red">${fS(totalBizExp)}</div></div>
-    <div class="met"><div class="ml">Net profit</div><div class="mv ${net>=0?'grn':'red'}">${fS(net)}</div></div>
-    <div class="met"><div class="ml">Business km</div><div class="mv">${bizKm.toFixed(1)}</div></div>
-    <div class="met"><div class="ml">Business %</div><div class="mv">${(bp*100).toFixed(1)}%</div><div class="pb"><div class="pf" style="width:${bp*100}%"></div></div></div>
-    <div class="met"><div class="ml">Best method</div><div class="mv" style="font-size:13px">${better}</div></div>`
+  $('dash-metrics').innerHTML=`<div class="met"><div class="ml">YTD income</div><div class="mv grn">${fS(totalIncome)}</div></div><div class="met"><div class="ml">YTD expenses</div><div class="mv red">${fS(totalBizExp)}</div></div><div class="met"><div class="ml">Net profit</div><div class="mv ${net>=0?'grn':'red'}">${fS(net)}</div></div><div class="met"><div class="ml">Business km</div><div class="mv">${bizKm.toFixed(1)}</div></div><div class="met"><div class="ml">Business %</div><div class="mv">${(bp*100).toFixed(1)}%</div><div class="pb"><div class="pf" style="width:${bp*100}%"></div></div></div><div class="met"><div class="ml">Best method</div><div class="mv" style="font-size:13px">${better}</div></div>`
   $('dash-eff').innerHTML=bizKm>0?`<div class="sr"><span class="c">Income/km</span><span class="a">${fmt(totalIncome/bizKm)}</span></div><div class="sr"><span class="c">Expense/km</span><span class="a">${fmt(totalBizExp/bizKm)}</span></div><div class="sr"><span class="c">Profit/km</span><span class="a">${fS(net/bizKm)}</span></div>`:'<p style="font-size:13px;color:var(--mut)">Classify trips first</p>'
   const uI=incomes.filter(i=>i.platform==='Uber').reduce((s,e)=>s+e.total,0),lI=incomes.filter(i=>i.platform==='Lyft').reduce((s,e)=>s+e.total,0)
   $('dash-plat').innerHTML=`<div class="sr"><span class="c">Uber</span><span class="a">${fS(uI)}</span></div><div class="sr"><span class="c">Lyft</span><span class="a">${fS(lI)}</span></div>`
   const hT=trips.length>0,hI=incomes.length>0,hE=expenses.length>0,hV=vault.length>0,sc=[hT,hI,hE,hV].filter(Boolean).length
-  $('dash-audit').innerHTML=`<div style="font-size:13px;margin-bottom:8px">Score: <strong>${sc}/4</strong></div><div class="pb" style="height:12px"><div class="pf" style="width:${sc*25}%;background:${sc===4?'var(--grn)':sc>=2?'var(--amb)':'var(--red)'}"></div></div><div style="margin-top:10px;font-size:12px;color:var(--mut)">${hT?'&#10003;':'&#10007;'} Mileage (${trips.length})<br>${hI?'&#10003;':'&#10007;'} Income (${incomes.length})<br>${hE?'&#10003;':'&#10007;'} Expenses (${expenses.length})<br>${hV?'&#10003;':'&#10007;'} Vault (${vault.length})</div>`
+  $('dash-audit').innerHTML=`<div style="font-size:13px;margin-bottom:8px">Score: <strong>${sc}/4</strong></div><div class="pb" style="height:12px"><div class="pf" style="width:${sc*25}%;background:${sc===4?'var(--grn)':sc>=2?'var(--amb)':'var(--red)'}"></div></div><div style="margin-top:10px;font-size:12px;color:var(--mut)">${hT?'&#10003;':'&#10007;'} Mileage<br>${hI?'&#10003;':'&#10007;'} Income<br>${hE?'&#10003;':'&#10007;'} Expenses<br>${hV?'&#10003;':'&#10007;'} Vault</div>`
 
   // INCOME
   $('inc-total').innerHTML=`<div class="mv grn" style="font-size:24px">${fS(totalIncome)}</div>`
-  $('inc-list').innerHTML=incomes.slice(0,30).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date}</div><div style="font-size:14px;font-weight:500">${e.platform}</div><div style="font-size:12px;color:var(--mut)">Earn:${fmt(e.earn)} Tips:${fmt(e.tips)}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--grn)">${fS(e.total)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('income',${e.id})">delete</button></div>`).join('')
+  $('inc-list').innerHTML=incomes.slice(0,30).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date}</div><div style="font-size:14px;font-weight:500">${e.platform}</div><div style="font-size:12px;color:var(--mut)">Earn:${fmt(e.earn)} Tips:${fmt(e.tips)}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--grn)">${fS(e.total)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('income',${e.id})">del</button></div>`).join('')
 
   // EXPENSES
   const catT={};expenses.forEach(e=>{catT[e.category]=(catT[e.category]||0)+getBE(e)})
   $('exp-cats').innerHTML=Object.entries(catT).sort((a,b)=>b[1]-a[1]).map(([c,a])=>`<div class="sr"><span class="c">${c}</span><span class="a">${fS(a)}</span></div>`).join('')+`<div class="tr"><span>Total</span><span>${fS(totalBizExp)}</span></div>`
-  $('exp-list').innerHTML=expenses.slice(0,30).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date} | ${e.alloc}</div><div style="font-size:14px;font-weight:500">${e.category}${e.desc?': '+e.desc:''}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--red)">${fS(e.amount)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('expenses',${e.id})">delete</button></div>`).join('')
+  $('exp-list').innerHTML=expenses.slice(0,30).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date} | ${e.alloc}</div><div style="font-size:14px;font-weight:500">${e.category}${e.desc?': '+e.desc:''}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--red)">${fS(e.amount)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('expenses',${e.id})">del</button></div>`).join('')
 
   // P&L
   let pl='<div style="font-weight:600;font-size:13px;margin-bottom:6px">REVENUE</div>'
@@ -775,19 +785,18 @@ function render(){
 
   // SETTINGS
   const autoP=totalKm>0?bizKm/totalKm:0,ov=O('settings').overridePct
-  $('app-info').innerHTML=`<div class="sr"><span class="c">Auto (from trips)</span><span class="a">${(autoP*100).toFixed(1)}%</span></div><div class="sr"><span class="c">Override</span><span class="a">${ov?ov+'%':'Off'}</span></div><div class="sr" style="font-weight:600"><span class="c">Active</span><span class="a">${(bp*100).toFixed(1)}%</span></div>`
-
-  // AUDIT SCORE
+  $('app-info').innerHTML=`<div class="sr"><span class="c">Auto</span><span class="a">${(autoP*100).toFixed(1)}%</span></div><div class="sr"><span class="c">Override</span><span class="a">${ov?ov+'%':'Off'}</span></div><div class="sr" style="font-weight:600"><span class="c">Active</span><span class="a">${(bp*100).toFixed(1)}%</span></div>`
   $('audit-score').innerHTML=`<div style="text-align:center;padding:10px"><div style="font-size:48px;font-weight:700;color:${sc===4?'var(--grn)':sc>=2?'var(--amb)':'var(--red)'}">${sc*25}%</div><div style="font-size:13px;color:var(--mut)">CRA audit ready</div></div>`
-
   renderVault()
 }
 
-// ===== INIT =====
+// INIT
 const td=new Date().toISOString().slice(0,10);$('m-date').value=td;$('i-date').value=td;$('e-date').value=td
-const ss=getSt();$('s-cp').value=ss.carPrice;$('s-cl').value=ss.carLife;$('s-yo').value=ss.yearsOwned;$('s-od').value=ss.odometer;$('s-r1').value=ss.rate1;$('s-r2').value=ss.rate2;$('s-ss').value=ss.startSpeed;$('s-st').value=ss.stopTimeout
+const ss=getSt();$('s-cp').value=ss.carPrice;$('s-cl').value=ss.carLife;$('s-yo').value=ss.yearsOwned;$('s-od').value=ss.odometer;$('s-r1').value=ss.rate1;$('s-r2').value=ss.rate2
 renderNav();renderMenu();render()
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})
+// Request location permission immediately on first load
+if(navigator.geolocation)navigator.geolocation.getCurrentPosition(()=>{},()=>{},{enableHighAccuracy:true})
 </script>
 </body>
 </html>
