@@ -1,4 +1,4 @@
-const CACHE = 'uberlyft-v3';
+const CACHE = 'uberlyft-v4';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
