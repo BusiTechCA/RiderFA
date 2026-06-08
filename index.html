@@ -11,19 +11,15 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#f5f5f7;--card:#fff;--pri:#4472C4;--grn:#34a853;--red:#ea4335;--amb:#fbbc04;--pur:#7c3aed;--txt:#1a1a1a;--mut:#6b7280;--brd:#e5e7eb;--ibg:#f9fafb;--rad:12px;--sh:0 1px 3px rgba(0,0,0,.08);--gray:#9ca3af}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;padding-bottom:72px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;padding-bottom:72px;overflow-x:hidden}
 .header{background:var(--pri);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px}
 .header h1{font-size:18px;font-weight:600;flex:1}
 .ham{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px 8px;line-height:1}
-
-/* BOTTOM NAV */
 .bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--brd);display:flex;z-index:100;padding:4px 0;padding-bottom:env(safe-area-inset-bottom,4px)}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0;cursor:pointer;color:var(--mut);font-size:10px;font-weight:500;transition:.2s;position:relative;border:none;background:none;font-family:inherit}
 .bnav-item.active{color:var(--pri)}
 .bnav-item .bi{font-size:20px;margin-bottom:1px}
 .bnav-item .badge{position:absolute;top:0;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:8px;font-weight:700;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px}
-
-/* SLIDE MENU */
 .menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150;opacity:0;pointer-events:none;transition:.25s}
 .menu-overlay.open{opacity:1;pointer-events:auto}
 .menu-panel{position:fixed;top:0;left:0;bottom:0;width:280px;background:#fff;z-index:151;transform:translateX(-100%);transition:.3s;overflow-y:auto;padding:20px 0}
@@ -38,7 +34,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .mi .mi-star{margin-left:auto;font-size:14px;color:var(--brd);cursor:pointer}
 .mi .mi-star.fav{color:var(--amb)}
 .menu-sep{height:1px;background:var(--brd);margin:8px 16px}
-
 .page{display:none;padding:16px}
 .page.active{display:block}
 .card{background:var(--card);border-radius:var(--rad);padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
@@ -69,8 +64,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .si{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--brd)}
 .si label{font-size:13px;flex:1}
 .si input{width:80px;text-align:right;padding:6px 8px;border:1px solid var(--brd);border-radius:6px;font-size:13px}
-
-/* TRACKING STATUS BAR */
 .track-bar{background:#1b5e20;color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;display:none}
 .track-bar.active{display:flex}
 .track-bar .dot{width:10px;height:10px;border-radius:50%;background:#4caf50;animation:blink 1s infinite}
@@ -78,11 +71,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .track-bar .info{flex:1;font-size:12px}
 .track-bar .info strong{font-size:14px}
 .track-bar .stop-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
-
-/* TRIP CARD */
-.trip-card{background:var(--card);border-radius:var(--rad);padding:14px;margin-bottom:10px;box-shadow:var(--sh);border-left:4px solid var(--amb);position:relative}
+/* TRIP CARD — swipeable */
+.trip-card{background:var(--card);border-radius:var(--rad);padding:14px;margin-bottom:10px;box-shadow:var(--sh);border-left:4px solid var(--amb);position:relative;transition:transform .2s,opacity .2s;touch-action:pan-y}
 .trip-card.classified{border-left-color:var(--grn);opacity:.7}
 .trip-card.selected{border:2px solid var(--pri);border-left:4px solid var(--pri)}
+.trip-card.swiping{transition:none}
+.trip-card .swipe-hint{position:absolute;top:0;bottom:0;width:80px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border-radius:var(--rad);opacity:0;transition:.2s}
+.trip-card .swipe-hint.left{left:0;background:var(--pur);color:#fff}
+.trip-card .swipe-hint.right{right:0;background:var(--grn);color:#fff}
 .trip-card .tc-top{display:flex;justify-content:space-between;align-items:flex-start}
 .trip-card .tc-route{flex:1}
 .trip-card .tc-km{font-size:18px;font-weight:700;color:var(--pri);text-align:right}
@@ -104,24 +100,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .cl-finding{background:#fff3e0;color:#e65100}
 .cl-passenger{background:#e8f5e9;color:#2e7d32}
 .cl-notdriving{background:#f1f3f4;color:#5f6368}
-
-/* BATCH SELECT BAR */
-.batch-bar{position:fixed;bottom:56px;left:0;right:0;background:var(--pri);color:#fff;padding:10px 16px;display:none;align-items:center;gap:8px;z-index:99;box-shadow:0 -2px 8px rgba(0,0,0,.15)}
+.batch-bar{position:fixed;bottom:56px;left:0;right:0;background:var(--pri);color:#fff;padding:10px 16px;display:none;align-items:center;gap:6px;z-index:99;box-shadow:0 -2px 8px rgba(0,0,0,.15)}
 .batch-bar.show{display:flex}
-.batch-bar .bb-count{font-size:13px;font-weight:600;flex:1}
-.batch-bar .bb-btn{padding:8px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
-.bb-personal{background:#f3e8ff;color:#7c3aed}
-.bb-finding{background:#fff3e0;color:#e65100}
-.bb-passenger{background:#e8f5e9;color:#2e7d32}
-.bb-notdriving{background:#f1f3f4;color:#5f6368}
-
-/* SELECT MODE TOOLBAR */
+.batch-bar .bb-count{font-size:12px;font-weight:600;flex:1}
+.batch-bar .bb-btn{padding:7px 10px;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer}
 .sel-toolbar{display:none;align-items:center;gap:10px;padding:10px 16px;background:var(--ibg);border-radius:8px;margin-bottom:12px}
 .sel-toolbar.show{display:flex}
 .sel-toolbar label{font-size:13px;font-weight:500;flex:1}
 .sel-toolbar input[type=checkbox]{width:18px;height:18px;accent-color:var(--pri)}
 .sel-toolbar button{padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:var(--brd);color:var(--txt)}
-
+/* SWIPE INDICATOR */
+.swipe-guide{text-align:center;font-size:11px;color:var(--mut);padding:6px;margin-bottom:8px}
+.swipe-guide span{font-weight:600}
+/* TAX ESTIMATOR */
+.tax-box{background:linear-gradient(135deg,#1a237e,#4472C4);border-radius:var(--rad);padding:20px;color:#fff;margin-bottom:12px;text-align:center}
+.tax-box .tax-big{font-size:32px;font-weight:700;margin:8px 0}
+.tax-box .tax-lbl{font-size:11px;opacity:.8;text-transform:uppercase}
+.tax-box .tax-sub{font-size:12px;opacity:.9;margin-top:8px}
+.tax-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.tax-grid div{background:rgba(255,255,255,.12);border-radius:8px;padding:10px;text-align:center}
+.tax-grid .tl{font-size:10px;opacity:.7}
+.tax-grid .tv{font-size:16px;font-weight:700}
+/* GOAL */
+.goal-box{background:var(--ibg);border-radius:8px;padding:14px;margin-bottom:12px}
+.goal-box .goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.goal-box .goal-amt{font-size:20px;font-weight:700;color:var(--pri)}
+.goal-box .goal-target{font-size:12px;color:var(--mut)}
 /* CAPTURE */
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cb{background:var(--card);border:2px dashed var(--brd);border-radius:var(--rad);padding:20px 12px;text-align:center;cursor:pointer;transition:.2s}
@@ -163,546 +167,258 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .winner h4,.loser h4{font-size:13px;color:var(--mut)}
 .winner .big{font-size:24px;font-weight:700;color:var(--grn)}
 .loser .big{font-size:24px;font-weight:700;color:var(--mut)}
+/* DEDUCTION CARD */
+.ded-card{background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid var(--amb)}
+.ded-card .ded-title{font-size:13px;font-weight:600}
+.ded-card .ded-desc{font-size:11px;color:var(--mut);margin-top:2px}
+.ded-card .ded-amt{font-size:14px;font-weight:700;color:var(--grn);margin-top:4px}
+/* PRINT REPORT */
+@media print{.header,.bnav,.track-bar,.menu-overlay,.menu-panel,.batch-bar,.sel-toolbar{display:none!important}.page{display:block!important;padding:0!important}.page:not(#page-report){display:none!important}#page-report{display:block!important}}
 </style>
 </head>
 <body>
-
-<!-- TRACKING BAR -->
 <div class="track-bar" id="track-bar" onclick="navTo('trips')">
   <div class="dot"></div>
   <div class="info"><strong id="bar-km">0.0 km</strong> &middot; <span id="bar-time">0:00</span> &middot; Tracking</div>
   <button class="stop-btn" onclick="event.stopPropagation();stopAutoTrack()">Stop</button>
 </div>
-
 <div class="header">
   <button class="ham" onclick="toggleMenu()">&#9776;</button>
   <h1>RideTrack</h1>
-  <span style="font-size:10px;opacity:.6">v3.0</span>
+  <span style="font-size:10px;opacity:.6">v4.0</span>
 </div>
-
-<!-- MENU -->
 <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
 <div class="menu-panel" id="menu-panel">
   <div class="menu-head"><h2>RideTrack</h2><p>CRA-Compliant Tracker</p></div>
   <div id="menu-items"></div>
   <div class="menu-sep"></div>
-  <div style="padding:12px 20px;font-size:11px;color:var(--mut)">Tap &#9733; to add/remove favorites (max 4)</div>
+  <div style="padding:12px 20px;font-size:11px;color:var(--mut)">Tap &#9733; to set favorites (max 4)</div>
 </div>
 
-<!-- PAGES -->
+<!-- TRIPS -->
 <div class="page active" id="page-trips">
   <div class="card" id="unclassified-header"></div>
-  <div class="sel-toolbar" id="sel-toolbar">
-    <input type="checkbox" id="sel-all" onchange="toggleSelectAll()">
-    <label for="sel-all" id="sel-count">Select all</label>
-    <button onclick="exitSelectMode()">Cancel</button>
-  </div>
+  <div class="swipe-guide" id="swipe-guide">Swipe: <span>&#8594; Business</span> | <span>&#8592; Personal</span> — or tap buttons below each trip</div>
+  <div class="sel-toolbar" id="sel-toolbar"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"><label for="sel-all" id="sel-count">Select all</label><button onclick="exitSelectMode()">Cancel</button></div>
   <div id="unclassified-list"></div>
   <div class="card" style="margin-top:16px"><h3>Recently classified</h3><div id="classified-list"></div></div>
 </div>
-
+<!-- TRACK -->
 <div class="page" id="page-track">
   <div class="card" style="text-align:center">
     <h3>Auto-tracking</h3>
-    <p style="font-size:13px;color:var(--mut);margin-bottom:16px">Detects driving (>15 km/h sustained). Trips end after 5 min stopped (like MileIQ). Traffic lights are never counted as trip ends.</p>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:16px">Detects driving >15 km/h. Trip ends after 5 min stopped. Traffic lights never split trips.</p>
     <button class="btn bp" id="auto-toggle" onclick="toggleAutoTrack()" style="font-size:16px;padding:16px">Enable auto-tracking</button>
     <div id="track-stats" style="margin-top:16px"></div>
   </div>
-  <div class="ib">For true background tracking (app fully closed), install the native Android version. See Settings > Native App for instructions.</div>
-  <div class="card"><h3>Today's summary</h3><div id="today-summary"></div></div>
-  <div class="card">
-    <h3>Manual trip entry</h3>
-    <div class="fg"><label>Date</label><input type="date" id="m-date"></div>
-    <div class="fr">
-      <div class="fg"><label>Distance (km)</label><input type="number" id="m-km" step="0.1"></div>
-      <div class="fg"><label>Type</label>
-        <select id="m-type"><option value="unclassified">Classify later</option><option value="passenger">Passenger trip</option><option value="finding">Finding riders</option><option value="personal">Personal</option><option value="notdriving">Not driving</option></select>
-      </div>
-    </div>
-    <div class="fg"><label>Notes</label><input type="text" id="m-notes" placeholder="Optional"></div>
-    <button class="btn bp" onclick="addManualTrip()">Add trip</button>
-  </div>
+  <div class="card"><h3>Today</h3><div id="today-summary"></div></div>
+  <div class="card"><h3>Manual trip</h3><div class="fg"><label>Date</label><input type="date" id="m-date"></div><div class="fr"><div class="fg"><label>Distance (km)</label><input type="number" id="m-km" step="0.1"></div><div class="fg"><label>Type</label><select id="m-type"><option value="unclassified">Classify later</option><option value="passenger">Passenger</option><option value="finding">Finding riders</option><option value="personal">Personal</option><option value="notdriving">Not driving</option></select></div></div><div class="fg"><label>Notes</label><input type="text" id="m-notes" placeholder="Optional"></div><button class="btn bp" onclick="addManualTrip()">Add trip</button></div>
 </div>
-
+<!-- DASHBOARD -->
 <div class="page" id="page-dashboard">
   <div class="mg" id="dash-metrics"></div>
-  <div class="card" style="margin-top:12px"><h3>Per-km efficiency</h3><div id="dash-eff"></div></div>
+  <div class="card" style="margin-top:12px"><h3>Earnings goal</h3><div id="dash-goal"></div></div>
+  <div class="card"><h3>Earnings by day</h3><div id="dash-days"></div></div>
   <div class="card"><h3>Platform breakdown</h3><div id="dash-plat"></div></div>
   <div class="card"><h3>Audit readiness</h3><div id="dash-audit"></div></div>
 </div>
-
+<!-- TAX -->
+<div class="page" id="page-tax">
+  <div class="tax-box" id="tax-est"></div>
+  <div class="card"><h3>Quarterly deadlines</h3><div id="tax-deadlines"></div></div>
+  <div class="card"><h3>Deduction suggestions</h3><div id="tax-deductions"></div></div>
+</div>
+<!-- INCOME -->
 <div class="page" id="page-income">
-  <div class="card">
-    <h3>Log income</h3>
-    <div class="fr">
-      <div class="fg"><label>Date</label><input type="date" id="i-date"></div>
-      <div class="fg"><label>Platform</label><select id="i-plat"><option>Uber</option><option>Lyft</option><option>Other</option></select></div>
-    </div>
-    <div class="fr">
-      <div class="fg"><label>Trip earnings ($)</label><input type="number" id="i-earn" step="0.01"></div>
-      <div class="fg"><label>Tips ($)</label><input type="number" id="i-tips" step="0.01" value="0"></div>
-    </div>
-    <div class="fr">
-      <div class="fg"><label>Bonuses ($)</label><input type="number" id="i-bonus" step="0.01" value="0"></div>
-      <div class="fg"><label>Tolls reimb ($)</label><input type="number" id="i-tolls" step="0.01" value="0"></div>
-    </div>
-    <button class="btn bp" onclick="addIncome()">Add income</button>
-  </div>
+  <div class="card"><h3>Log income</h3><div class="fr"><div class="fg"><label>Date</label><input type="date" id="i-date"></div><div class="fg"><label>Platform</label><select id="i-plat"><option>Uber</option><option>Lyft</option><option>DoorDash</option><option>Skip</option><option>Instacart</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Earnings ($)</label><input type="number" id="i-earn" step="0.01"></div><div class="fg"><label>Tips ($)</label><input type="number" id="i-tips" step="0.01" value="0"></div></div><div class="fr"><div class="fg"><label>Bonuses ($)</label><input type="number" id="i-bonus" step="0.01" value="0"></div><div class="fg"><label>Tolls reimb ($)</label><input type="number" id="i-tolls" step="0.01" value="0"></div></div><button class="btn bp" onclick="addIncome()">Add income</button></div>
   <div class="card"><h3>YTD</h3><div id="inc-total"></div></div>
   <div id="inc-list"></div>
 </div>
-
+<!-- EXPENSES -->
 <div class="page" id="page-expenses">
-  <div class="card">
-    <h3>Log expense</h3>
-    <div class="fr">
-      <div class="fg"><label>Date</label><input type="date" id="e-date"></div>
-      <div class="fg"><label>Category</label><select id="e-cat"><option>Fuel</option><option>Maintenance</option><option>Insurance</option><option>Depreciation/CCA</option><option>License/Registration</option><option>Interest on Car Loan</option><option>Parking</option><option>Tolls</option><option>Car Wash</option><option>Phone/Data</option><option>Supplies</option><option>Other</option></select></div>
-    </div>
-    <div class="fr">
-      <div class="fg"><label>Amount ($)</label><input type="number" id="e-amt" step="0.01"></div>
-      <div class="fg"><label>Allocation</label><select id="e-alloc"><option value="Shared">Shared</option><option value="Fully Business">100% Business</option><option value="Fully Personal">100% Personal</option></select></div>
-    </div>
-    <div class="fg"><label>Description</label><input type="text" id="e-desc" placeholder="e.g. Gas - Shell"></div>
-    <button class="btn bp" onclick="addExpense()">Add expense</button>
-  </div>
+  <div class="card"><h3>Log expense</h3><div class="fr"><div class="fg"><label>Date</label><input type="date" id="e-date"></div><div class="fg"><label>Category</label><select id="e-cat"><option>Fuel</option><option>Maintenance</option><option>Insurance</option><option>Depreciation/CCA</option><option>License/Registration</option><option>Interest on Car Loan</option><option>Parking</option><option>Tolls</option><option>Car Wash</option><option>Phone/Data</option><option>Supplies</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount ($)</label><input type="number" id="e-amt" step="0.01"></div><div class="fg"><label>Allocation</label><select id="e-alloc"><option value="Shared">Shared</option><option value="Fully Business">100% Business</option><option value="Fully Personal">100% Personal</option></select></div></div><div class="fg"><label>Description</label><input type="text" id="e-desc" placeholder="e.g. Gas - Shell"></div><button class="btn bp" onclick="addExpense()">Add expense</button></div>
   <div class="card"><h3>By category</h3><div id="exp-cats"></div></div>
   <div id="exp-list"></div>
 </div>
-
+<!-- CAPTURE -->
 <div class="page" id="page-capture">
-  <div class="ib">Tap any button below. Choose to snap a photo or upload a file.</div>
+  <div class="ib">Snap a photo or upload a file.</div>
   <div class="cg">
-    <div class="cb" onclick="openSheet('income-uber','Uber pay','Snap or upload Uber earnings')"><div class="ci">&#128663;</div><div class="cl2">Uber pay</div><div class="cd">Snap / upload</div></div>
-    <div class="cb" onclick="openSheet('income-lyft','Lyft pay','Snap or upload Lyft earnings')"><div class="ci">&#128660;</div><div class="cl2">Lyft pay</div><div class="cd">Snap / upload</div></div>
-    <div class="cb" onclick="openSheet('receipt-fuel','Gas receipt','Paper or digital receipt')"><div class="ci">&#9981;</div><div class="cl2">Gas receipt</div><div class="cd">Snap / upload</div></div>
-    <div class="cb" onclick="openSheet('receipt-maint','Maintenance','Oil, tires, repairs')"><div class="ci">&#128295;</div><div class="cl2">Maintenance</div><div class="cd">Snap / upload</div></div>
-    <div class="cb" onclick="openSheet('receipt-ins','Insurance','Policy or payment')"><div class="ci">&#128196;</div><div class="cl2">Insurance</div><div class="cd">Snap / upload</div></div>
-    <div class="cb" onclick="openSheet('receipt-other','Other','Any expense proof')"><div class="ci">&#128206;</div><div class="cl2">Other</div><div class="cd">Snap / upload</div></div>
+    <div class="cb" onclick="openSheet('income-uber','Uber pay','Snap or upload')"><div class="ci">&#128663;</div><div class="cl2">Uber pay</div><div class="cd">Snap/upload</div></div>
+    <div class="cb" onclick="openSheet('income-lyft','Lyft pay','Snap or upload')"><div class="ci">&#128660;</div><div class="cl2">Lyft pay</div><div class="cd">Snap/upload</div></div>
+    <div class="cb" onclick="openSheet('receipt-fuel','Gas receipt','Receipt')"><div class="ci">&#9981;</div><div class="cl2">Gas</div><div class="cd">Snap/upload</div></div>
+    <div class="cb" onclick="openSheet('receipt-maint','Maintenance','Receipt')"><div class="ci">&#128295;</div><div class="cl2">Maintenance</div><div class="cd">Snap/upload</div></div>
+    <div class="cb" onclick="openSheet('receipt-ins','Insurance','Document')"><div class="ci">&#128196;</div><div class="cl2">Insurance</div><div class="cd">Snap/upload</div></div>
+    <div class="cb" onclick="openSheet('receipt-other','Other','Any receipt')"><div class="ci">&#128206;</div><div class="cl2">Other</div><div class="cd">Snap/upload</div></div>
   </div>
   <input type="file" accept="image/*" capture="environment" id="cam-in" class="fi" onchange="handleCap(event)">
   <input type="file" accept="image/*,application/pdf" id="gal-in" class="fi" onchange="handleCap(event)">
-  <div class="aso" id="cap-sheet" onclick="closeSheet(event)"><div class="ash">
-    <h4 id="sh-title">Capture</h4><p id="sh-desc">Choose method</p>
-    <button class="ao" onclick="doCap('cam')"><div class="aoi">&#128247;</div><div><div class="aot">Take photo</div><div class="aos">Camera for paper receipts</div></div></button>
-    <button class="ao" onclick="doCap('gal')"><div class="aoi">&#128193;</div><div><div class="aot">Upload file</div><div class="aos">Screenshot, PDF, or saved image</div></div></button>
-    <button class="ac" onclick="closeSheet()">Cancel</button>
-  </div></div>
+  <div class="aso" id="cap-sheet" onclick="closeSheet(event)"><div class="ash"><h4 id="sh-title">Capture</h4><p id="sh-desc">Choose method</p><button class="ao" onclick="doCap('cam')"><div class="aoi">&#128247;</div><div><div class="aot">Take photo</div><div class="aos">Camera</div></div></button><button class="ao" onclick="doCap('gal')"><div class="aoi">&#128193;</div><div><div class="aot">Upload file</div><div class="aos">Screenshot, PDF, image</div></div></button><button class="ac" onclick="closeSheet()">Cancel</button></div></div>
 </div>
-
+<!-- VAULT -->
 <div class="page" id="page-vault">
   <div class="vs" id="vault-stats"></div>
-  <div class="fr" style="margin-bottom:12px">
-    <div class="fg"><label>Type</label><select id="vf" onchange="renderVault()"><option value="all">All</option><option value="income">Income</option><option value="receipt">Receipts</option></select></div>
-    <div class="fg"><label>Month</label><select id="vm" onchange="renderVault()"><option value="all">All</option></select></div>
-  </div>
+  <div class="fr" style="margin-bottom:12px"><div class="fg"><label>Type</label><select id="vf" onchange="renderVault()"><option value="all">All</option><option value="income">Income</option><option value="receipt">Receipts</option></select></div><div class="fg"><label>Month</label><select id="vm" onchange="renderVault()"><option value="all">All</option></select></div></div>
   <div id="vault-list"></div>
   <button class="btn be" onclick="exportVault()">Export vault</button>
 </div>
-
+<!-- P&L -->
 <div class="page" id="page-pnl"><div class="card"><h3>Income statement</h3><div id="pnl"></div></div></div>
-
+<!-- CRA -->
 <div class="page" id="page-cra">
   <div class="ib">CRA mileage rate vs actual expenses — which saves more?</div>
   <div id="cra"></div>
 </div>
-
+<!-- TAX GUIDE -->
 <div class="page" id="page-taxguide">
-  <div class="card">
-    <h3>File your own taxes (T2125)</h3>
-    <div class="step"><div class="sn">Step 1</div><div class="st">Get your annual summary</div><div class="sb">Uber/Lyft email you a tax summary in Jan/Feb. This is NOT a T4 — rideshare is self-employment.</div></div>
-    <div class="step"><div class="sn">Step 2</div><div class="st">Use free tax software</div><div class="sb">Wealthsimple Tax (free) or StudioTax. Both are CRA NETFILE certified.</div></div>
-    <div class="step"><div class="sn">Step 3</div><div class="st">Add Form T2125</div><div class="sb">Industry code: 485310 (Rideshare). Enter your total income from this app's Dashboard.</div></div>
-    <div class="step"><div class="sn">Step 4</div><div class="st">Enter vehicle expenses</div><div class="sb">Use the CRA tab to see which method (mileage rate vs actual) gives bigger deduction.</div></div>
-    <div class="step"><div class="sn">Step 5</div><div class="st">CCA for your car</div><div class="sb">Class 10 or 10.1 (if >$38K). Enter purchase price and business start date.</div></div>
-    <div class="step"><div class="sn">Step 6</div><div class="st">HST/GST</div><div class="sb">Register if income >$30K in 4 consecutive quarters. Below that it's optional.</div></div>
-    <div class="step"><div class="sn">Step 7</div><div class="st">Keep records 6 years</div><div class="sb">CRA requires 6 years. Your Vault + data exports are evidence.</div></div>
+  <div class="card"><h3>File your own taxes (T2125)</h3>
+    <div class="step"><div class="sn">Step 1</div><div class="st">Get your annual summary</div><div class="sb">Uber/Lyft email you a tax summary in Jan/Feb. Self-employment — NOT a T4.</div></div>
+    <div class="step"><div class="sn">Step 2</div><div class="st">Use free tax software</div><div class="sb">Wealthsimple Tax or StudioTax. Both CRA NETFILE certified.</div></div>
+    <div class="step"><div class="sn">Step 3</div><div class="st">Add Form T2125</div><div class="sb">Industry code: 485310. Enter total income from Dashboard.</div></div>
+    <div class="step"><div class="sn">Step 4</div><div class="st">Enter vehicle expenses</div><div class="sb">Use CRA tab for best method. Enter categories from P&L.</div></div>
+    <div class="step"><div class="sn">Step 5</div><div class="st">CCA for your car</div><div class="sb">Class 10 or 10.1 (>$37K). Enter purchase price + start date.</div></div>
+    <div class="step"><div class="sn">Step 6</div><div class="st">HST/GST</div><div class="sb">Register if >$30K in 4 consecutive quarters.</div></div>
+    <div class="step"><div class="sn">Step 7</div><div class="st">Keep records 6 years</div><div class="sb">Vault + exports = your evidence.</div></div>
   </div>
   <div class="card"><h3>Audit readiness</h3><div id="audit-score"></div></div>
 </div>
-
+<!-- REPORT -->
+<div class="page" id="page-report"><div class="card"><h3>Tax Report (T2125)</h3><p style="font-size:12px;color:var(--mut);margin-bottom:12px">Generate a printable CRA-ready report</p><button class="btn bp" onclick="generateReport()">Generate & Print PDF</button></div><div id="report-content"></div></div>
+<!-- SETTINGS -->
 <div class="page" id="page-settings">
-  <div class="card">
-    <h3>Business-use %</h3>
-    <div id="app-info"></div>
-    <div class="fg" style="margin-top:12px"><label>Manual override %</label><input type="number" id="s-ov" step="0.1" min="0" max="100" placeholder="Blank = auto"></div>
-    <button class="btn bp" onclick="saveOv()">Save</button>
-    <button class="btn" style="background:var(--brd);margin-top:8px" onclick="clearOv()">Clear</button>
-  </div>
-  <div class="card">
-    <h3>Vehicle</h3>
-    <div class="si"><label>Car price ($)</label><input type="number" id="s-cp" value="28500"></div>
-    <div class="si"><label>Useful life (yrs)</label><input type="number" id="s-cl" value="7"></div>
-    <div class="si"><label>Years owned</label><input type="number" id="s-yo" value="1.75" step="0.25"></div>
-    <div class="si"><label>Starting odometer</label><input type="number" id="s-od" value="67450"></div>
-    <button class="btn bp" style="margin-top:12px" onclick="saveCar()">Save</button>
-  </div>
-  <div class="card">
-    <h3>CRA rates</h3>
-    <div class="si"><label>First 5,000 km</label><input type="number" id="s-r1" value="0.72" step="0.01"></div>
-    <div class="si"><label>Above 5,000 km</label><input type="number" id="s-r2" value="0.66" step="0.01"></div>
-    <button class="btn bp" style="margin-top:12px" onclick="saveCRA()">Save</button>
-  </div>
-  <div class="card">
-    <h3>Data</h3>
-    <button class="btn be" onclick="exportAll()">Full backup (JSON)</button>
-    <div class="fg" style="margin-top:12px"><label>Restore</label><input type="file" id="imp" accept=".json" onchange="importD(event)"></div>
-    <button class="btn bd" style="width:100%;margin-top:12px" onclick="if(confirm('DELETE ALL DATA?')){localStorage.clear();location.reload()}">Reset all data</button>
-  </div>
+  <div class="card"><h3>Business-use %</h3><div id="app-info"></div><div class="fg" style="margin-top:12px"><label>Manual override %</label><input type="number" id="s-ov" step="0.1" min="0" max="100" placeholder="Auto"></div><button class="btn bp" onclick="saveOv()">Save</button><button class="btn" style="background:var(--brd);margin-top:8px" onclick="clearOv()">Clear</button></div>
+  <div class="card"><h3>Earnings goal</h3><div class="si"><label>Weekly target ($)</label><input type="number" id="s-goal" value="500" step="50"></div><button class="btn bp" style="margin-top:12px" onclick="saveGoal()">Save</button></div>
+  <div class="card"><h3>Tax province</h3><div class="fg"><select id="s-prov"><option value="ON">Ontario</option><option value="BC">British Columbia</option><option value="AB">Alberta</option><option value="QC">Quebec</option><option value="MB">Manitoba</option><option value="SK">Saskatchewan</option><option value="NS">Nova Scotia</option><option value="NB">New Brunswick</option><option value="NL">Newfoundland</option><option value="PE">PEI</option></select></div><button class="btn bp" onclick="saveProv()">Save</button></div>
+  <div class="card"><h3>Vehicle</h3><div class="si"><label>Car price ($)</label><input type="number" id="s-cp" value="28500"></div><div class="si"><label>Useful life (yrs)</label><input type="number" id="s-cl" value="7"></div><div class="si"><label>Years owned</label><input type="number" id="s-yo" value="1.75" step="0.25"></div><div class="si"><label>Starting odometer</label><input type="number" id="s-od" value="67450"></div><button class="btn bp" style="margin-top:12px" onclick="saveCar()">Save</button></div>
+  <div class="card"><h3>CRA rates</h3><div class="si"><label>First 5,000 km</label><input type="number" id="s-r1" value="0.72" step="0.01"></div><div class="si"><label>Above 5,000 km</label><input type="number" id="s-r2" value="0.66" step="0.01"></div><button class="btn bp" style="margin-top:12px" onclick="saveCRA()">Save</button></div>
+  <div class="card"><h3>Data</h3><button class="btn be" onclick="exportAll()">Full backup</button><div class="fg" style="margin-top:12px"><label>Restore</label><input type="file" id="imp" accept=".json" onchange="importD(event)"></div><button class="btn bd" style="width:100%;margin-top:12px" onclick="if(confirm('DELETE ALL DATA?')){localStorage.clear();location.reload()}">Reset</button></div>
 </div>
 
-<!-- BOTTOM NAV -->
 <nav class="bnav" id="bnav"></nav>
-
-<!-- BATCH CLASSIFY BAR -->
-<div class="batch-bar" id="batch-bar">
-  <span class="bb-count" id="bb-count">0 selected</span>
-  <button class="bb-btn bb-personal" onclick="batchClassify('personal')">Personal</button>
-  <button class="bb-btn bb-finding" onclick="batchClassify('finding')">Finding</button>
-  <button class="bb-btn bb-passenger" onclick="batchClassify('passenger')">Passenger</button>
-  <button class="bb-btn bb-notdriving" onclick="batchClassify('notdriving')">Not driving</button>
-</div>
+<div class="batch-bar" id="batch-bar"><span class="bb-count" id="bb-count">0</span><button class="bb-btn" style="background:#f3e8ff;color:#7c3aed" onclick="batchClassify('personal')">Personal</button><button class="bb-btn" style="background:#fff3e0;color:#e65100" onclick="batchClassify('finding')">Finding</button><button class="bb-btn" style="background:#e8f5e9;color:#2e7d32" onclick="batchClassify('passenger')">Passenger</button><button class="bb-btn" style="background:#f1f3f4;color:#5f6368" onclick="batchClassify('notdriving')">Not driving</button></div>
 
 <script>
-// ===== DATA (same localStorage keys — all existing data preserved) =====
 const D=(k,v)=>{if(v===undefined){try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}}localStorage.setItem(k,JSON.stringify(v))};
 const O=(k,v)=>{if(v===undefined){try{return JSON.parse(localStorage.getItem(k))||{}}catch{return{}}}localStorage.setItem(k,JSON.stringify(v))};
 const $=id=>document.getElementById(id);
-
-// ===== PAGES =====
-const PAGES=[
-  {id:'trips',icon:'&#128203;',label:'Trips'},
-  {id:'track',icon:'&#128205;',label:'Track'},
-  {id:'dashboard',icon:'&#128200;',label:'Dashboard'},
-  {id:'income',icon:'&#128176;',label:'Income'},
-  {id:'expenses',icon:'&#128179;',label:'Expenses'},
-  {id:'capture',icon:'&#128247;',label:'Capture'},
-  {id:'vault',icon:'&#128274;',label:'Vault'},
-  {id:'pnl',icon:'&#128202;',label:'P&L'},
-  {id:'cra',icon:'&#127464;',label:'CRA'},
-  {id:'taxguide',icon:'&#128218;',label:'Tax Guide'},
-  {id:'settings',icon:'&#9881;',label:'Settings'}
-];
-const DEFAULT_FAVS=['trips','track','dashboard','capture'];
+const PAGES=[{id:'trips',icon:'&#128203;',label:'Trips'},{id:'track',icon:'&#128205;',label:'Track'},{id:'dashboard',icon:'&#128200;',label:'Dashboard'},{id:'tax',icon:'&#128178;',label:'Tax'},{id:'income',icon:'&#128176;',label:'Income'},{id:'expenses',icon:'&#128179;',label:'Expenses'},{id:'capture',icon:'&#128247;',label:'Capture'},{id:'vault',icon:'&#128274;',label:'Vault'},{id:'pnl',icon:'&#128202;',label:'P&L'},{id:'cra',icon:'&#127464;',label:'CRA'},{id:'taxguide',icon:'&#128218;',label:'Tax Guide'},{id:'report',icon:'&#128196;',label:'Report'},{id:'settings',icon:'&#9881;',label:'Settings'}];
+const DEFAULT_FAVS=['trips','track','dashboard','tax'];
 function getFavs(){return O('settings').favs||DEFAULT_FAVS}
 function setFavs(f){const s=O('settings');s.favs=f;O('settings',s)}
-
 let currentPage='trips';
-
-function navTo(pg){
-  currentPage=pg;
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  $('page-'+pg).classList.add('active');
-  renderNav();render();
-  $('menu-overlay').classList.remove('open');$('menu-panel').classList.remove('open');
-}
+function navTo(pg){currentPage=pg;document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('page-'+pg).classList.add('active');renderNav();render();$('menu-overlay').classList.remove('open');$('menu-panel').classList.remove('open')}
 function toggleMenu(){$('menu-overlay').classList.toggle('open');$('menu-panel').classList.toggle('open');renderMenu()}
-function toggleFav(id){
-  let f=getFavs();
-  if(f.includes(id))f=f.filter(x=>x!==id);
-  else{if(f.length>=4){alert('Max 4. Remove one first.');return}f.push(id)}
-  setFavs(f);renderMenu();renderNav()
-}
-function renderMenu(){
-  const favs=getFavs();
-  $('menu-items').innerHTML=PAGES.map(p=>`<button class="mi ${currentPage===p.id?'active':''}" onclick="navTo('${p.id}')"><span class="mi-icon">${p.icon}</span>${p.label}<span class="mi-star ${favs.includes(p.id)?'fav':''}" onclick="event.stopPropagation();toggleFav('${p.id}')">${favs.includes(p.id)?'&#9733;':'&#9734;'}</span></button>`).join('')
-}
-function renderNav(){
-  const favs=getFavs(),unc=D('trips').filter(t=>t.type==='unclassified').length;
-  $('bnav').innerHTML=favs.map(fid=>{
-    const p=PAGES.find(x=>x.id===fid);if(!p)return'';
-    const badge=(fid==='trips'&&unc>0)?`<span class="badge">${unc}</span>`:'';
-    return`<button class="bnav-item ${currentPage===fid?'active':''}" onclick="navTo('${fid}')"><span class="bi">${p.icon}</span>${p.label}${badge}</button>`
-  }).join('')
-}
+function toggleFav(id){let f=getFavs();if(f.includes(id))f=f.filter(x=>x!==id);else{if(f.length>=4){alert('Max 4');return}f.push(id)}setFavs(f);renderMenu();renderNav()}
+function renderMenu(){const favs=getFavs();$('menu-items').innerHTML=PAGES.map(p=>`<button class="mi ${currentPage===p.id?'active':''}" onclick="navTo('${p.id}')"><span class="mi-icon">${p.icon}</span>${p.label}<span class="mi-star ${favs.includes(p.id)?'fav':''}" onclick="event.stopPropagation();toggleFav('${p.id}')">${favs.includes(p.id)?'&#9733;':'&#9734;'}</span></button>`).join('')}
+function renderNav(){const favs=getFavs(),unc=D('trips').filter(t=>t.type==='unclassified').length;$('bnav').innerHTML=favs.map(fid=>{const p=PAGES.find(x=>x.id===fid);if(!p)return'';const badge=(fid==='trips'&&unc>0)?`<span class="badge">${unc}</span>`:'';return`<button class="bnav-item ${currentPage===fid?'active':''}" onclick="navTo('${fid}')"><span class="bi">${p.icon}</span>${p.label}${badge}</button>`}).join('')}
 
-// ===== GPS TRACKING — MileIQ-style (5-min timeout, 15km/h driving threshold) =====
-let autoTrack=false, watchId=null, curTrip=null, tripTimer=null, stopTimeout=null, wakeLock=null
-let lastMovingTime=0, lastGPSTime=0
-const DRIVE_SPEED=15/3.6  // 15 km/h = definite driving (not walking/running)
-const STOP_MS=300000       // 5 minutes = trip end (like MileIQ)
-
+// ===== GPS TRACKING =====
+let autoTrack=false,watchId=null,curTrip=null,tripTimer=null,stopTimeout=null,wakeLock=null,lastMovingTime=0,lastGPSTime=0
+const DRIVE_SPEED=15/3.6,STOP_MS=300000
 function toggleAutoTrack(){if(autoTrack)stopAutoTrack();else startAutoTrack()}
-
-function startAutoTrack(){
-  if(!navigator.geolocation)return alert('GPS not available')
-  autoTrack=true
-  localStorage.setItem('autoTrackOn','1')
-  $('auto-toggle').textContent='Disable auto-tracking'
-  $('auto-toggle').style.background='var(--red)'
-  $('track-bar').classList.add('active')
-  acquireWakeLock()
-  startGPS()
-  tripTimer=setInterval(()=>{
-    if(curTrip){
-      const el=Math.floor((Date.now()-curTrip.startTime)/1000)
-      $('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)
-    }
-    // Keepalive: restart GPS if silent >20s
-    if(autoTrack&&Date.now()-lastGPSTime>20000){
-      if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){}
-      startGPS()
-    }
-  },1000)
-}
-
-function startGPS(){
-  watchId=navigator.geolocation.watchPosition(onGPS,err=>{
-    // Never give up — keep retrying
-    if(autoTrack)setTimeout(()=>{if(autoTrack)startGPS()},5000)
-  },{enableHighAccuracy:true,maximumAge:3000,timeout:15000})
-}
-
-function onGPS(pos){
-  lastGPSTime=Date.now()
-  const speed=pos.coords.speed!=null?pos.coords.speed:0
-  const acc=pos.coords.accuracy||999
-  const pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now(),speed,acc}
-  
-  // Ignore very inaccurate readings (>50m)
-  if(acc>50)return
-  
-  if(!curTrip&&speed>=DRIVE_SPEED){
-    // === START TRIP (driving speed detected) ===
-    curTrip={id:Date.now(),startTime:Date.now(),points:[pt],startLat:pt.lat,startLng:pt.lng,dist:0,moving:true}
-    lastMovingTime=Date.now()
-    // Get precise start address (zoom 18 = house number level)
-    reverseGeo(pt.lat,pt.lng).then(a=>{if(curTrip)curTrip.startAddr=a})
-    if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
-  } else if(curTrip){
-    // === IN A TRIP ===
-    const last=curTrip.points[curTrip.points.length-1]
-    const d=hav(last.lat,last.lng,pt.lat,pt.lng)
-    if(d>0.005){curTrip.dist+=d;curTrip.points.push(pt)}
-    curTrip.endLat=pt.lat;curTrip.endLng=pt.lng
-    
-    if(speed>=DRIVE_SPEED){
-      // Driving — trip continues, cancel any stop timer
-      curTrip.moving=true
-      lastMovingTime=Date.now()
-      if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
-    } else if(speed<2){
-      // Fully stopped (<7 km/h)
-      if(curTrip.moving){
-        curTrip.moving=false
-        // Start 5-min stop timer
-        if(!stopTimeout){
-          stopTimeout=setTimeout(()=>{
-            if(curTrip&&!curTrip.moving&&(Date.now()-lastMovingTime)>=STOP_MS){
-              finishTrip()
-            }
-            stopTimeout=null
-          },STOP_MS)
-        }
-      }
-    } else {
-      // Slow movement (7-15 km/h) — could be parking lot, traffic crawl
-      // DON'T end trip, DON'T reset timer — just observe
-      // If speed picks back up above DRIVE_SPEED, stop timer gets cleared above
-    }
-    $('bar-km').textContent=curTrip.dist.toFixed(1)+' km'
-    const el=Math.floor((Date.now()-curTrip.startTime)/1000)
-    $('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)
-  }
-}
-
-function stopAutoTrack(){
-  if(curTrip)finishTrip()
-  autoTrack=false
-  localStorage.removeItem('autoTrackOn')
-  if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){}
-  watchId=null
-  if(tripTimer){clearInterval(tripTimer);tripTimer=null}
-  if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
-  releaseWakeLock()
-  $('auto-toggle').textContent='Enable auto-tracking'
-  $('auto-toggle').style.background='var(--pri)'
-  $('track-bar').classList.remove('active')
-  $('bar-km').textContent='0.0 km';$('bar-time').textContent='0:00'
-  render()
-}
-
-function finishTrip(){
-  if(!curTrip||curTrip.dist<0.1){curTrip=null;return}
-  const trip={
-    id:curTrip.id,
-    date:new Date(curTrip.startTime).toISOString().slice(0,10),
-    time:new Date(curTrip.startTime).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
-    endTime:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
-    totalKm:Math.round(curTrip.dist*100)/100,
-    duration:Math.floor((Date.now()-curTrip.startTime)/60000),
-    startAddr:curTrip.startAddr||'',
-    endAddr:'',
-    type:'unclassified',
-    gps:true
-  }
-  if(curTrip.endLat)reverseGeo(curTrip.endLat,curTrip.endLng).then(a=>{
-    const trips=D('trips');const t=trips.find(x=>x.id===trip.id);if(t){t.endAddr=a;D('trips',trips);render()}
-  })
-  const trips=D('trips');trips.unshift(trip);D('trips',trips)
-  curTrip=null
-  if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
-  if(navigator.vibrate)navigator.vibrate([200,100,200])
-  render()
-}
-
-// ===== PRECISE ADDRESS (zoom=18 gives house numbers) =====
-async function reverseGeo(lat,lng){
-  try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&addressdetails=1`)
-    const d=await r.json()
-    const a=d.address
-    // Build precise address: house_number + road + city
-    let addr=''
-    if(a.house_number)addr+=a.house_number+' '
-    addr+=a.road||a.pedestrian||a.cycleway||''
-    if(a.suburb&&!(a.road||'').includes(a.suburb))addr+=(addr?', ':'')+a.suburb
-    if(a.city||a.town||a.village)addr+=(addr?', ':'')+(a.city||a.town||a.village)
-    return addr||d.display_name||'Unknown'
-  }catch{return''}
-}
-
+function startAutoTrack(){if(!navigator.geolocation)return alert('GPS not available');autoTrack=true;localStorage.setItem('autoTrackOn','1');$('auto-toggle').textContent='Disable auto-tracking';$('auto-toggle').style.background='var(--red)';$('track-bar').classList.add('active');acquireWakeLock();startGPS();tripTimer=setInterval(()=>{if(curTrip){const el=Math.floor((Date.now()-curTrip.startTime)/1000);$('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)}if(autoTrack&&Date.now()-lastGPSTime>20000){if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){}startGPS()}},1000)}
+function startGPS(){watchId=navigator.geolocation.watchPosition(onGPS,err=>{if(autoTrack)setTimeout(()=>{if(autoTrack)startGPS()},5000)},{enableHighAccuracy:true,maximumAge:3000,timeout:15000})}
+function onGPS(pos){lastGPSTime=Date.now();const speed=pos.coords.speed!=null?pos.coords.speed:0,acc=pos.coords.accuracy||999,pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now(),speed};if(acc>50)return;if(!curTrip&&speed>=DRIVE_SPEED){curTrip={id:Date.now(),startTime:Date.now(),points:[pt],startLat:pt.lat,startLng:pt.lng,dist:0,moving:true};lastMovingTime=Date.now();reverseGeo(pt.lat,pt.lng).then(a=>{if(curTrip)curTrip.startAddr=a});if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}}else if(curTrip){const last=curTrip.points[curTrip.points.length-1],d=hav(last.lat,last.lng,pt.lat,pt.lng);if(d>0.005){curTrip.dist+=d;curTrip.points.push(pt)}curTrip.endLat=pt.lat;curTrip.endLng=pt.lng;if(speed>=DRIVE_SPEED){curTrip.moving=true;lastMovingTime=Date.now();if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}}else if(speed<2){if(curTrip.moving){curTrip.moving=false;if(!stopTimeout){stopTimeout=setTimeout(()=>{if(curTrip&&!curTrip.moving&&(Date.now()-lastMovingTime)>=STOP_MS)finishTrip();stopTimeout=null},STOP_MS)}}}else{if(!curTrip.moving){curTrip.moving=true;lastMovingTime=Date.now();if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}}}$('bar-km').textContent=curTrip.dist.toFixed(1)+' km';const el=Math.floor((Date.now()-curTrip.startTime)/1000);$('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)}}
+function stopAutoTrack(){if(curTrip)finishTrip();autoTrack=false;localStorage.removeItem('autoTrackOn');if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){};watchId=null;if(tripTimer){clearInterval(tripTimer);tripTimer=null}if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}releaseWakeLock();$('auto-toggle').textContent='Enable auto-tracking';$('auto-toggle').style.background='var(--pri)';$('track-bar').classList.remove('active');$('bar-km').textContent='0.0 km';$('bar-time').textContent='0:00';render()}
+function finishTrip(){if(!curTrip||curTrip.dist<0.1){curTrip=null;return}const trip={id:curTrip.id,date:new Date(curTrip.startTime).toISOString().slice(0,10),time:new Date(curTrip.startTime).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),endTime:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),totalKm:Math.round(curTrip.dist*100)/100,duration:Math.floor((Date.now()-curTrip.startTime)/60000),startAddr:curTrip.startAddr||'',endAddr:'',type:'unclassified',gps:true};if(curTrip.endLat)reverseGeo(curTrip.endLat,curTrip.endLng).then(a=>{const trips=D('trips');const t=trips.find(x=>x.id===trip.id);if(t){t.endAddr=a;D('trips',trips);render()}});D('trips',[trip,...D('trips')]);curTrip=null;if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}if(navigator.vibrate)navigator.vibrate([200,100,200]);render()}
+async function reverseGeo(lat,lng){try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&addressdetails=1`);const d=await r.json(),a=d.address;let addr='';if(a.house_number)addr+=a.house_number+' ';addr+=a.road||a.pedestrian||'';if(a.city||a.town||a.village)addr+=(addr?', ':'')+(a.city||a.town||a.village);return addr||d.display_name||'Unknown'}catch{return''}}
 function hav(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
-
-// ===== WAKE LOCK =====
 async function acquireWakeLock(){if(!('wakeLock' in navigator))return;try{wakeLock=await navigator.wakeLock.request('screen')}catch(e){}}
 function releaseWakeLock(){if(wakeLock){try{wakeLock.release()}catch(e){};wakeLock=null}}
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&autoTrack){
-    acquireWakeLock()
-    if(Date.now()-lastGPSTime>15000){if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){};startGPS()}
-  }
-})
-// Auto-resume on page load
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&autoTrack){acquireWakeLock();if(Date.now()-lastGPSTime>15000){if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){};startGPS()}}})
 window.addEventListener('load',()=>{if(localStorage.getItem('autoTrackOn')==='1')startAutoTrack()})
 
+// ===== SWIPE GESTURES =====
+let swipeStartX=0,swipeStartY=0,swipingCard=null
+function initSwipe(el,tripId){el.addEventListener('touchstart',e=>{swipeStartX=e.touches[0].clientX;swipeStartY=e.touches[0].clientY;swipingCard={el,id:tripId}},{passive:true})
+el.addEventListener('touchmove',e=>{if(!swipingCard)return;const dx=e.touches[0].clientX-swipeStartX,dy=e.touches[0].clientY-swipeStartY;if(Math.abs(dy)>Math.abs(dx)){swipingCard=null;el.style.transform='';return}if(Math.abs(dx)>10){e.preventDefault();el.classList.add('swiping');el.style.transform=`translateX(${dx*0.6}px)`;el.style.opacity=Math.max(0.4,1-Math.abs(dx)/300)}},{passive:false})
+el.addEventListener('touchend',e=>{if(!swipingCard){return}const dx=e.changedTouches[0].clientX-swipeStartX;el.classList.remove('swiping');if(Math.abs(dx)>100){if(dx>0)classifyTrip(tripId,'passenger');else classifyTrip(tripId,'personal')}else{el.style.transform='';el.style.opacity=''}swipingCard=null})}
+
 // ===== BATCH SELECT =====
-let selectMode=false, selected=new Set()
-
-function enterSelectMode(){
-  selectMode=true;selected.clear();render()
-}
-function exitSelectMode(){
-  selectMode=false;selected.clear();
-  $('batch-bar').classList.remove('show');$('sel-toolbar').classList.remove('show')
-  render()
-}
-function toggleSelect(id){
-  if(selected.has(id))selected.delete(id);else selected.add(id)
-  updateSelectUI()
-}
-function toggleSelectAll(){
-  const unc=D('trips').filter(t=>t.type==='unclassified')
-  if(selected.size===unc.length){selected.clear()}
-  else{unc.forEach(t=>selected.add(t.id))}
-  updateSelectUI();render()
-}
-function updateSelectUI(){
-  $('bb-count').textContent=selected.size+' selected'
-  $('sel-count').textContent=selected.size>0?selected.size+' selected':'Select all'
-  $('sel-all').checked=selected.size===D('trips').filter(t=>t.type==='unclassified').length
-  if(selected.size>0)$('batch-bar').classList.add('show');else $('batch-bar').classList.remove('show')
-}
-function batchClassify(type){
-  if(selected.size===0)return
-  const trips=D('trips')
-  selected.forEach(id=>{
-    const t=trips.find(x=>x.id===id)
-    if(t){
-      t.type=type
-      if(type==='personal'||type==='notdriving'){t.bizKm=0;t.persKm=type==='personal'?t.totalKm:0}
-      else{t.bizKm=t.totalKm;t.persKm=0}
-    }
-  })
-  D('trips',trips)
-  exitSelectMode()
-}
-
-// ===== CLASSIFY SINGLE =====
-function classifyTrip(id,type){
-  const trips=D('trips'),t=trips.find(x=>x.id===id)
-  if(!t)return
-  t.type=type
-  if(type==='personal'||type==='notdriving'){t.bizKm=0;t.persKm=type==='personal'?t.totalKm:0}
-  else{t.bizKm=t.totalKm;t.persKm=0}
-  D('trips',trips);render()
-}
+let selectMode=false,selected=new Set()
+function enterSelectMode(){selectMode=true;selected.clear();render()}
+function exitSelectMode(){selectMode=false;selected.clear();$('batch-bar').classList.remove('show');$('sel-toolbar').classList.remove('show');render()}
+function toggleSelect(id){if(selected.has(id))selected.delete(id);else selected.add(id);updateSelectUI()}
+function toggleSelectAll(){const unc=D('trips').filter(t=>t.type==='unclassified');if(selected.size===unc.length)selected.clear();else unc.forEach(t=>selected.add(t.id));updateSelectUI();render()}
+function updateSelectUI(){$('bb-count').textContent=selected.size+' selected';$('sel-count').textContent=selected.size>0?selected.size+' selected':'Select all';$('sel-all').checked=selected.size===D('trips').filter(t=>t.type==='unclassified').length;if(selected.size>0)$('batch-bar').classList.add('show');else $('batch-bar').classList.remove('show')}
+function batchClassify(type){if(!selected.size)return;const trips=D('trips');selected.forEach(id=>{const t=trips.find(x=>x.id===id);if(t){t.type=type;if(type==='personal'||type==='notdriving'){t.bizKm=0;t.persKm=type==='personal'?t.totalKm:0}else{t.bizKm=t.totalKm;t.persKm=0}}});D('trips',trips);exitSelectMode()}
+function classifyTrip(id,type){const trips=D('trips'),t=trips.find(x=>x.id===id);if(!t)return;t.type=type;if(type==='personal'||type==='notdriving'){t.bizKm=0;t.persKm=type==='personal'?t.totalKm:0}else{t.bizKm=t.totalKm;t.persKm=0}D('trips',trips);render()}
 function deleteTrip(id){if(!confirm('Delete?'))return;D('trips',D('trips').filter(t=>t.id!==id));render()}
-
-// ===== MANUAL TRIP =====
-function addManualTrip(){
-  const d=$('m-date').value,km=parseFloat($('m-km').value),type=$('m-type').value
-  if(!d||!km||km<=0)return alert('Fill date and km')
-  const trip={id:Date.now(),date:d,time:'',endTime:'',totalKm:km,duration:0,startAddr:'Manual',endAddr:'',type,gps:false,
-    bizKm:type==='personal'||type==='notdriving'?0:(type==='unclassified'?0:km),persKm:type==='personal'?km:0,notes:$('m-notes').value}
-  D('trips',[trip,...D('trips')]);$('m-km').value='';$('m-notes').value='';render()
-}
+function addManualTrip(){const d=$('m-date').value,km=parseFloat($('m-km').value),type=$('m-type').value;if(!d||!km||km<=0)return alert('Fill date & km');D('trips',[{id:Date.now(),date:d,time:'',endTime:'',totalKm:km,duration:0,startAddr:'Manual',endAddr:'',type,gps:false,bizKm:type==='personal'||type==='notdriving'?0:(type==='unclassified'?0:km),persKm:type==='personal'?km:0,notes:$('m-notes').value},...D('trips')]);$('m-km').value='';$('m-notes').value='';render()}
 
 // ===== INCOME/EXPENSE =====
-function addIncome(){
-  const d=$('i-date').value,p=$('i-plat').value,earn=parseFloat($('i-earn').value)||0
-  const tips=parseFloat($('i-tips').value)||0,bonus=parseFloat($('i-bonus').value)||0,tolls=parseFloat($('i-tolls').value)||0
-  if(!d||earn===0)return alert('Fill date & earnings')
-  D('income',[...D('income'),{id:Date.now(),date:d,platform:p,earn,tips,bonus,tolls,total:earn+tips+bonus+tolls}])
-  $('i-earn').value='';$('i-tips').value='0';$('i-bonus').value='0';$('i-tolls').value='0';render()
-}
-function addExpense(){
-  const d=$('e-date').value,cat=$('e-cat').value,amt=parseFloat($('e-amt').value)||0,alloc=$('e-alloc').value
-  if(!d||amt===0)return alert('Fill date & amount')
-  D('expenses',[...D('expenses'),{id:Date.now(),date:d,category:cat,desc:$('e-desc').value,amount:amt,alloc}])
-  $('e-amt').value='';$('e-desc').value='';render()
-}
+function addIncome(){const d=$('i-date').value,p=$('i-plat').value,earn=parseFloat($('i-earn').value)||0,tips=parseFloat($('i-tips').value)||0,bonus=parseFloat($('i-bonus').value)||0,tolls=parseFloat($('i-tolls').value)||0;if(!d||earn===0)return alert('Fill date & earnings');D('income',[...D('income'),{id:Date.now(),date:d,platform:p,earn,tips,bonus,tolls,total:earn+tips+bonus+tolls}]);$('i-earn').value='';$('i-tips').value='0';$('i-bonus').value='0';$('i-tolls').value='0';render()}
+function addExpense(){const d=$('e-date').value,cat=$('e-cat').value,amt=parseFloat($('e-amt').value)||0,alloc=$('e-alloc').value;if(!d||amt===0)return alert('Fill date & amount');D('expenses',[...D('expenses'),{id:Date.now(),date:d,category:cat,desc:$('e-desc').value,amount:amt,alloc}]);$('e-amt').value='';$('e-desc').value='';render()}
 function delEntry(t,id){if(!confirm('Delete?'))return;D(t,D(t).filter(e=>e.id!==id));render()}
-
-// ===== CAPTURE =====
 let capType=''
 function openSheet(t,title,desc){capType=t;$('sh-title').textContent=title;$('sh-desc').textContent=desc;$('cap-sheet').classList.add('show')}
 function closeSheet(e){if(e&&e.target!==e.currentTarget)return;$('cap-sheet').classList.remove('show')}
 function doCap(m){$('cap-sheet').classList.remove('show');if(m==='cam')$('cam-in').click();else $('gal-in').click()}
-function handleCap(e){
-  const f=e.target.files[0];if(!f)return;const type=capType
-  const reader=new FileReader();reader.onload=function(ev){
-    const img=new Image();img.onload=function(){
-      const c=document.createElement('canvas'),mx=800,sc=mx/img.width
-      c.width=img.width>mx?mx:img.width;c.height=img.width>mx?img.height*sc:img.height
-      c.getContext('2d').drawImage(img,0,0,c.width,c.height)
-      D('vault',[...D('vault'),{id:Date.now(),date:new Date().toISOString().slice(0,10),time:new Date().toLocaleTimeString(),type,image:c.toDataURL('image/jpeg',.7),label:({
-        'income-uber':'Uber earnings','income-lyft':'Lyft earnings','receipt-fuel':'Fuel receipt','receipt-maint':'Maintenance','receipt-ins':'Insurance','receipt-other':'Other receipt'
-      })[type]||type}]);e.target.value='';capType='';alert('Saved to Vault!');render()
-    };img.src=ev.target.result
-  };reader.readAsDataURL(f)
-}
-
-// ===== VAULT =====
-function renderVault(){
-  const all=D('vault').sort((a,b)=>b.id-a.id),fil=$('vf').value,mon=$('vm').value
-  let f=all;if(fil==='income')f=f.filter(v=>v.type.startsWith('income'));if(fil==='receipt')f=f.filter(v=>v.type.startsWith('receipt'));if(mon!=='all')f=f.filter(v=>v.date.slice(0,7)===mon)
-  $('vault-stats').innerHTML=`<div><div class="num">${all.length}</div><div class="lbl">Total</div></div><div><div class="num">${all.filter(v=>v.type.startsWith('income')).length}</div><div class="lbl">Income</div></div><div><div class="num">${all.filter(v=>v.type.startsWith('receipt')).length}</div><div class="lbl">Receipts</div></div>`
-  $('vault-list').innerHTML=f.length?f.map(v=>`<div class="rt-card"><img src="${v.image}" class="rt-thumb"><div class="meta"><span class="tag ${v.type.startsWith('income')?'tag-inc':'tag-exp'}">${v.label}</span>${v.date}</div><button style="background:none;border:none;color:var(--red);font-size:11px;margin-top:4px;cursor:pointer" onclick="D('vault',D('vault').filter(x=>x.id!==${v.id}));render()">delete</button></div>`).join(''):'<p style="font-size:13px;color:var(--mut);text-align:center;padding:20px">No captures yet</p>'
-  const months=[...new Set(all.map(v=>v.date.slice(0,7)))].sort().reverse();const sel=$('vm'),cv=sel.value;sel.innerHTML='<option value="all">All</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join('');sel.value=cv||'all'
-}
+function handleCap(e){const f=e.target.files[0];if(!f)return;const type=capType;const reader=new FileReader();reader.onload=function(ev){const img=new Image();img.onload=function(){const c=document.createElement('canvas'),mx=800,sc=mx/img.width;c.width=img.width>mx?mx:img.width;c.height=img.width>mx?img.height*sc:img.height;c.getContext('2d').drawImage(img,0,0,c.width,c.height);D('vault',[...D('vault'),{id:Date.now(),date:new Date().toISOString().slice(0,10),time:new Date().toLocaleTimeString(),type,image:c.toDataURL('image/jpeg',.7),label:({'income-uber':'Uber','income-lyft':'Lyft','receipt-fuel':'Fuel','receipt-maint':'Maintenance','receipt-ins':'Insurance','receipt-other':'Other'})[type]||type}]);e.target.value='';capType='';alert('Saved!');render()};img.src=ev.target.result};reader.readAsDataURL(f)}
+function renderVault(){const all=D('vault').sort((a,b)=>b.id-a.id),fil=$('vf').value,mon=$('vm').value;let f=all;if(fil==='income')f=f.filter(v=>v.type.startsWith('income'));if(fil==='receipt')f=f.filter(v=>v.type.startsWith('receipt'));if(mon!=='all')f=f.filter(v=>v.date.slice(0,7)===mon);$('vault-stats').innerHTML=`<div><div class="num">${all.length}</div><div class="lbl">Total</div></div><div><div class="num">${all.filter(v=>v.type.startsWith('income')).length}</div><div class="lbl">Income</div></div><div><div class="num">${all.filter(v=>v.type.startsWith('receipt')).length}</div><div class="lbl">Receipts</div></div>`;$('vault-list').innerHTML=f.length?f.map(v=>`<div class="rt-card"><img src="${v.image}" class="rt-thumb"><div class="meta"><span class="tag ${v.type.startsWith('income')?'tag-inc':'tag-exp'}">${v.label}</span>${v.date}</div><button style="background:none;border:none;color:var(--red);font-size:11px;margin-top:4px;cursor:pointer" onclick="D('vault',D('vault').filter(x=>x.id!==${v.id}));render()">del</button></div>`).join(''):'<p style="font-size:13px;color:var(--mut);text-align:center;padding:20px">No captures</p>';const months=[...new Set(all.map(v=>v.date.slice(0,7)))].sort().reverse();const sel=$('vm'),cv=sel.value;sel.innerHTML='<option value="all">All</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join('');sel.value=cv||'all'}
 
 // ===== SETTINGS =====
 function saveOv(){const v=$('s-ov').value,s=O('settings');s.overridePct=v?parseFloat(v):null;O('settings',s);render()}
 function clearOv(){const s=O('settings');s.overridePct=null;O('settings',s);$('s-ov').value='';render()}
+function saveGoal(){const s=O('settings');s.weeklyGoal=parseFloat($('s-goal').value)||500;O('settings',s);alert('Goal saved!');render()}
+function saveProv(){const s=O('settings');s.province=$('s-prov').value;O('settings',s);alert('Province saved!');render()}
 function saveCar(){const s=O('settings');s.carPrice=parseFloat($('s-cp').value)||28500;s.carLife=parseFloat($('s-cl').value)||7;s.yearsOwned=parseFloat($('s-yo').value)||1;s.odometer=parseFloat($('s-od').value)||67450;O('settings',s);alert('Saved!');render()}
 function saveCRA(){const s=O('settings');s.rate1=parseFloat($('s-r1').value)||.72;s.rate2=parseFloat($('s-r2').value)||.66;O('settings',s);alert('Saved!');render()}
-function exportAll(){const a={trips:D('trips'),income:D('income'),expenses:D('expenses'),vault:D('vault'),settings:O('settings')};dl('ridetrack_backup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(a),'application/json')}
+function exportAll(){dl('ridetrack_backup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({trips:D('trips'),income:D('income'),expenses:D('expenses'),vault:D('vault'),settings:O('settings')}),'application/json')}
 function exportVault(){const d=D('vault');if(!d.length)return alert('Empty');dl('vault_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(d),'application/json')}
 function importD(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.trips)D('trips',d.trips);if(d.income)D('income',d.income);if(d.expenses)D('expenses',d.expenses);if(d.vault)D('vault',d.vault);if(d.settings)O('settings',d.settings);alert('Restored!');render()}catch{alert('Invalid')}};r.readAsText(f)}
 function dl(n,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click()}
 
+// ===== TAX ESTIMATOR =====
+function calcTax(income,expenses){
+  const net=Math.max(0,income-expenses),prov=O('settings').province||'ON'
+  // Federal rates 2025/2026
+  let fed=0;if(net<=57375)fed=net*.15;else if(net<=114750)fed=57375*.15+(net-57375)*.205;else fed=57375*.15+57375*.205+(net-114750)*.26
+  // Provincial (simplified — Ontario default)
+  const provRates={ON:.0505,BC:.0506,AB:.10,QC:.14,MB:.108,SK:.105,NS:.0879,NB:.094,NL:.087,PE:.098}
+  const provRate=provRates[prov]||.0505
+  let provincial=net*provRate
+  // CPP self-employed (2025: 11.9% on earnings $3500-$68500)
+  const cppMax=68500,cppExempt=3500,cppRate=.119
+  let cpp=Math.max(0,Math.min(net,cppMax)-cppExempt)*cppRate
+  // HST (only if >$30K — otherwise not required)
+  let hst=income>30000?income*.13*.5:0 // rough estimate: collect 13%, keep ~50% as net owing
+  return{fed:Math.round(fed),provincial:Math.round(provincial),cpp:Math.round(cpp),hst:Math.round(hst),total:Math.round(fed+provincial+cpp+hst),net:Math.round(net),marginalRate:Math.round((fed+provincial)/net*100)||0}
+}
+
+// ===== PDF REPORT =====
+function generateReport(){
+  const trips=D('trips'),incomes=D('income'),expenses=D('expenses'),st=getSt()
+  const classified=trips.filter(t=>t.type!=='unclassified'&&t.type!=='notdriving')
+  const bizKm=classified.reduce((s,t)=>s+(t.bizKm||0),0),totalKm=classified.reduce((s,t)=>s+t.totalKm,0)
+  const totalIncome=incomes.reduce((s,e)=>s+e.total,0),totalBizExp=expenses.reduce((s,e)=>s+getBE(e),0)
+  const bp=getBP(),r1=st.rate1||.72,r2=st.rate2||.66
+  const cra=bizKm<=5000?bizKm*r1:5000*r1+(bizKm-5000)*r2
+  const catT={};expenses.forEach(e=>{catT[e.category]=(catT[e.category]||0)+getBE(e)})
+  const year=new Date().getFullYear()
+  let h=`<div style="font-family:serif;padding:20px;max-width:700px;margin:0 auto"><h1 style="text-align:center;border-bottom:2px solid #000;padding-bottom:10px">Tax Report — ${year}<br><small style="font-weight:400;font-size:14px">T2125 Statement of Business Activities — Rideshare</small></h1>`
+  h+=`<h2>Income Summary</h2><table style="width:100%;border-collapse:collapse;margin:10px 0"><tr style="border-bottom:1px solid #ccc"><td>Total Rideshare Income</td><td style="text-align:right;font-weight:700">${fS(totalIncome)}</td></tr></table>`
+  h+=`<h2>Vehicle Expenses</h2><table style="width:100%;border-collapse:collapse;margin:10px 0">`
+  Object.entries(catT).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{h+=`<tr style="border-bottom:1px solid #eee"><td>${k}</td><td style="text-align:right">${fS(v)}</td></tr>`})
+  h+=`<tr style="border-top:2px solid #000;font-weight:700"><td>Total Business Expenses</td><td style="text-align:right">${fS(totalBizExp)}</td></tr></table>`
+  h+=`<h2>Mileage</h2><table style="width:100%;border-collapse:collapse;margin:10px 0"><tr><td>Total km driven</td><td style="text-align:right">${totalKm.toFixed(0)} km</td></tr><tr><td>Business km</td><td style="text-align:right">${bizKm.toFixed(0)} km</td></tr><tr><td>Business-use %</td><td style="text-align:right">${(bp*100).toFixed(1)}%</td></tr></table>`
+  h+=`<h2>CRA Deduction Comparison</h2><table style="width:100%;border-collapse:collapse;margin:10px 0"><tr><td>Mileage method (${r1}/km + ${r2}/km)</td><td style="text-align:right">${fS(cra)}</td></tr><tr><td>Actual expense method</td><td style="text-align:right">${fS(totalBizExp)}</td></tr><tr style="font-weight:700;border-top:2px solid #000"><td>Better method</td><td style="text-align:right">${cra>totalBizExp?'CRA Mileage':'Actual Expenses'} (saves ${fS(Math.abs(cra-totalBizExp))})</td></tr></table>`
+  h+=`<h2>Net Profit</h2><table style="width:100%;border-collapse:collapse;margin:10px 0"><tr style="font-size:18px;font-weight:700"><td>Net Business Income</td><td style="text-align:right">${fS(totalIncome-totalBizExp)}</td></tr></table>`
+  h+=`<p style="margin-top:30px;font-size:11px;color:#666">Generated by RideTrack on ${new Date().toLocaleDateString()}. Industry code: 485310 (Rideshare/Taxi). Keep this report with your records for 6 years.</p></div>`
+  $('report-content').innerHTML=h
+  setTimeout(()=>window.print(),300)
+}
+
 // ===== CALCS =====
-function getSt(){return Object.assign({carPrice:28500,carLife:7,yearsOwned:1.75,rate1:.72,rate2:.66,odometer:67450},O('settings'))}
+function getSt(){return Object.assign({carPrice:28500,carLife:7,yearsOwned:1.75,rate1:.72,rate2:.66,odometer:67450,weeklyGoal:500,province:'ON'},O('settings'))}
 function getBP(){const o=O('settings').overridePct;if(o!=null&&o!=='')return o/100;const t=D('trips').filter(x=>x.type!=='unclassified'&&x.type!=='notdriving'),tk=t.reduce((s,x)=>s+x.totalKm,0),bk=t.reduce((s,x)=>s+(x.bizKm||0),0);return tk>0?bk/tk:0}
 function getBE(e){if(e.alloc==='Fully Business')return e.amount;if(e.alloc==='Fully Personal')return 0;return e.amount*getBP()}
 function fmt(n){return'$'+Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
 function fS(n){return(n<0?'-':'')+fmt(n)}
 
-// ===== MAIN RENDER =====
+// ===== RENDER =====
 function render(){
-  const trips=D('trips'),incomes=D('income').sort((a,b)=>b.date.localeCompare(a.date)),expenses=D('expenses').sort((a,b)=>b.date.localeCompare(a.date))
-  const vault=D('vault'),st=getSt(),bp=getBP()
+  const trips=D('trips'),incomes=D('income').sort((a,b)=>b.date.localeCompare(a.date)),expenses=D('expenses').sort((a,b)=>b.date.localeCompare(a.date)),st=getSt(),bp=getBP()
   const classified=trips.filter(t=>t.type!=='unclassified'),unclassified=trips.filter(t=>t.type==='unclassified')
   const kmTrips=classified.filter(t=>t.type!=='notdriving')
   const totalKm=kmTrips.reduce((s,t)=>s+t.totalKm,0),bizKm=kmTrips.reduce((s,t)=>s+(t.bizKm||0),0)
@@ -710,92 +426,71 @@ function render(){
   const r1=st.rate1||.72,r2=st.rate2||.66,cra=bizKm<=5000?bizKm*r1:5000*r1+(bizKm-5000)*r2
   const better=cra>totalBizExp?'CRA Mileage':(totalBizExp>cra?'Actual':'Equal')
   renderNav()
-
   // TRIPS
   const selClass=selectMode?' select-mode':''
-  $('unclassified-header').innerHTML=unclassified.length?
-    `<h3>Classify ${unclassified.length} trip${unclassified.length>1?'s':''}</h3><div style="display:flex;gap:8px;align-items:center"><p style="font-size:12px;color:var(--mut);flex:1">Tap buttons or use batch select</p><button style="background:var(--pri);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer" onclick="enterSelectMode()">Select</button></div>`
-    :`<h3>All caught up!</h3><p style="font-size:12px;color:var(--mut)">No unclassified trips.</p>`
-  
-  if(selectMode){$('sel-toolbar').classList.add('show');updateSelectUI()}
-  else{$('sel-toolbar').classList.remove('show');$('batch-bar').classList.remove('show')}
-
-  $('unclassified-list').innerHTML=unclassified.sort((a,b)=>b.id-a.id).slice(0,50).map(t=>{
-    const isSelected=selected.has(t.id)
-    return`<div class="trip-card${selClass}${isSelected?' selected':''}" ${selectMode?`onclick="toggleSelect(${t.id});render()"`:''}> 
-      <input type="checkbox" class="tc-check" ${isSelected?'checked':''} onclick="event.stopPropagation();toggleSelect(${t.id});render()">
-      <div class="tc-top">
-        <div class="tc-route">
-          <div class="tc-addr">${t.startAddr||'Start'} <span>&#8594;</span> ${t.endAddr||'End'}</div>
-          <div class="tc-meta">${t.date} ${t.time?'| '+t.time+' - '+t.endTime:''} | ${t.duration||0} min | ${t.totalKm.toFixed(1)} km${t.gps?' | GPS':''}</div>
-        </div>
-        <div class="tc-km">${t.totalKm.toFixed(1)} km</div>
-      </div>
-      ${selectMode?'':`<div class="tc-btns">
-        <button class="tc-btn personal" onclick="classifyTrip(${t.id},'personal')"><span class="tc-icon">&#128100;</span>Personal</button>
-        <button class="tc-btn finding" onclick="classifyTrip(${t.id},'finding')"><span class="tc-icon">&#128269;</span>Finding</button>
-        <button class="tc-btn passenger" onclick="classifyTrip(${t.id},'passenger')"><span class="tc-icon">&#128176;</span>Passenger</button>
-        <button class="tc-btn notdriving" onclick="classifyTrip(${t.id},'notdriving')"><span class="tc-icon">&#128683;</span>Not driving</button>
-      </div>`}
-    </div>`}).join('')
-
-  $('classified-list').innerHTML=classified.sort((a,b)=>b.id-a.id).slice(0,20).map(t=>{
-    const cls=t.type==='personal'?'cl-personal':t.type==='finding'?'cl-finding':t.type==='notdriving'?'cl-notdriving':'cl-passenger'
-    const lbl=t.type==='personal'?'Personal':t.type==='finding'?'Finding riders':t.type==='notdriving'?'Not driving':'Passenger trip'
-    const col=t.type==='personal'?'var(--pur)':t.type==='finding'?'var(--amb)':t.type==='notdriving'?'var(--gray)':'var(--grn)'
-    return`<div class="trip-card classified" style="border-left-color:${col}">
-      <div class="tc-top"><div class="tc-route"><div class="tc-addr">${t.startAddr||'Start'} <span>&#8594;</span> ${t.endAddr||'End'}</div><div class="tc-meta">${t.date} | ${t.totalKm.toFixed(1)} km</div></div><div class="tc-km">${t.totalKm.toFixed(1)}</div></div>
-      <span class="classified-label ${cls}">${lbl}</span>
-      <button style="background:none;border:none;color:var(--red);font-size:11px;float:right;margin-top:-20px;cursor:pointer" onclick="deleteTrip(${t.id})">del</button>
-    </div>`}).join('')||'<p style="font-size:13px;color:var(--mut)">No classified trips yet</p>'
-
+  $('unclassified-header').innerHTML=unclassified.length?`<h3>Classify ${unclassified.length} trip${unclassified.length>1?'s':''}</h3><div style="display:flex;gap:8px;align-items:center"><p style="font-size:12px;color:var(--mut);flex:1">Swipe or tap buttons</p><button style="background:var(--pri);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer" onclick="enterSelectMode()">Select</button></div>`:`<h3>All caught up!</h3><p style="font-size:12px;color:var(--mut)">No unclassified trips.</p>`
+  $('swipe-guide').style.display=unclassified.length&&!selectMode?'block':'none'
+  if(selectMode){$('sel-toolbar').classList.add('show');updateSelectUI()}else{$('sel-toolbar').classList.remove('show');$('batch-bar').classList.remove('show')}
+  $('unclassified-list').innerHTML=unclassified.sort((a,b)=>b.id-a.id).slice(0,50).map(t=>{const isSel=selected.has(t.id);return`<div class="trip-card${selClass}${isSel?' selected':''}" id="tc-${t.id}" ${selectMode?`onclick="toggleSelect(${t.id});render()"`:''}><input type="checkbox" class="tc-check" ${isSel?'checked':''} onclick="event.stopPropagation();toggleSelect(${t.id});render()"><div class="tc-top"><div class="tc-route"><div class="tc-addr">${t.startAddr||'Start'} <span>&#8594;</span> ${t.endAddr||'End'}</div><div class="tc-meta">${t.date} ${t.time?'| '+t.time+'-'+t.endTime:''} | ${t.duration||0}m | ${t.totalKm.toFixed(1)}km${t.gps?' GPS':''}</div></div><div class="tc-km">${t.totalKm.toFixed(1)}</div></div>${selectMode?'':`<div class="tc-btns"><button class="tc-btn personal" onclick="classifyTrip(${t.id},'personal')"><span class="tc-icon">&#128100;</span>Personal</button><button class="tc-btn finding" onclick="classifyTrip(${t.id},'finding')"><span class="tc-icon">&#128269;</span>Finding</button><button class="tc-btn passenger" onclick="classifyTrip(${t.id},'passenger')"><span class="tc-icon">&#128176;</span>Passenger</button><button class="tc-btn notdriving" onclick="classifyTrip(${t.id},'notdriving')"><span class="tc-icon">&#128683;</span>Not driving</button></div>`}</div>`}).join('')
+  // Init swipe on new cards
+  if(!selectMode)unclassified.forEach(t=>{const el=$('tc-'+t.id);if(el&&!el.dataset.swipe){el.dataset.swipe='1';initSwipe(el,t.id)}})
+  $('classified-list').innerHTML=classified.sort((a,b)=>b.id-a.id).slice(0,15).map(t=>{const cls=t.type==='personal'?'cl-personal':t.type==='finding'?'cl-finding':t.type==='notdriving'?'cl-notdriving':'cl-passenger';const lbl=t.type==='personal'?'Personal':t.type==='finding'?'Finding':t.type==='notdriving'?'Not driving':'Passenger';const col=t.type==='personal'?'var(--pur)':t.type==='finding'?'var(--amb)':t.type==='notdriving'?'var(--gray)':'var(--grn)';return`<div class="trip-card classified" style="border-left-color:${col}"><div class="tc-top"><div class="tc-route"><div class="tc-addr">${t.startAddr||'Start'} &#8594; ${t.endAddr||'End'}</div><div class="tc-meta">${t.date} | ${t.totalKm.toFixed(1)}km</div></div><div class="tc-km">${t.totalKm.toFixed(1)}</div></div><span class="classified-label ${cls}">${lbl}</span><button style="background:none;border:none;color:var(--red);font-size:11px;float:right;margin-top:-20px;cursor:pointer" onclick="deleteTrip(${t.id})">del</button></div>`}).join('')||'<p style="font-size:13px;color:var(--mut)">None yet</p>'
   // TRACK
   const today=new Date().toISOString().slice(0,10),todayT=trips.filter(t=>t.date===today)
-  $('today-summary').innerHTML=`<div class="sr"><span class="c">Trips today</span><span class="a">${todayT.length}</span></div><div class="sr"><span class="c">KM today</span><span class="a">${todayT.reduce((s,t)=>s+t.totalKm,0).toFixed(1)}</span></div><div class="sr"><span class="c">Unclassified</span><span class="a">${todayT.filter(t=>t.type==='unclassified').length}</span></div>`
-  $('track-stats').innerHTML=autoTrack?`<p style="font-size:13px;color:var(--grn);font-weight:600">Tracking active${curTrip?' — on a trip':' — waiting for driving speed'}</p>`:`<p style="font-size:13px;color:var(--mut)">Tracking is off</p>`
-
+  $('today-summary').innerHTML=`<div class="sr"><span class="c">Trips today</span><span class="a">${todayT.length}</span></div><div class="sr"><span class="c">KM today</span><span class="a">${todayT.reduce((s,t)=>s+t.totalKm,0).toFixed(1)}</span></div>`
+  $('track-stats').innerHTML=autoTrack?`<p style="font-size:13px;color:var(--grn);font-weight:600">Active${curTrip?' — on trip':''}</p>`:`<p style="font-size:13px;color:var(--mut)">Off</p>`
   // DASHBOARD
-  $('dash-metrics').innerHTML=`<div class="met"><div class="ml">YTD income</div><div class="mv grn">${fS(totalIncome)}</div></div><div class="met"><div class="ml">YTD expenses</div><div class="mv red">${fS(totalBizExp)}</div></div><div class="met"><div class="ml">Net profit</div><div class="mv ${net>=0?'grn':'red'}">${fS(net)}</div></div><div class="met"><div class="ml">Business km</div><div class="mv">${bizKm.toFixed(1)}</div></div><div class="met"><div class="ml">Business %</div><div class="mv">${(bp*100).toFixed(1)}%</div><div class="pb"><div class="pf" style="width:${bp*100}%"></div></div></div><div class="met"><div class="ml">Best method</div><div class="mv" style="font-size:13px">${better}</div></div>`
-  $('dash-eff').innerHTML=bizKm>0?`<div class="sr"><span class="c">Income/km</span><span class="a">${fmt(totalIncome/bizKm)}</span></div><div class="sr"><span class="c">Expense/km</span><span class="a">${fmt(totalBizExp/bizKm)}</span></div><div class="sr"><span class="c">Profit/km</span><span class="a">${fS(net/bizKm)}</span></div>`:'<p style="font-size:13px;color:var(--mut)">Classify trips first</p>'
-  const uI=incomes.filter(i=>i.platform==='Uber').reduce((s,e)=>s+e.total,0),lI=incomes.filter(i=>i.platform==='Lyft').reduce((s,e)=>s+e.total,0)
-  $('dash-plat').innerHTML=`<div class="sr"><span class="c">Uber</span><span class="a">${fS(uI)}</span></div><div class="sr"><span class="c">Lyft</span><span class="a">${fS(lI)}</span></div>`
-  const hT=trips.length>0,hI=incomes.length>0,hE=expenses.length>0,hV=vault.length>0,sc=[hT,hI,hE,hV].filter(Boolean).length
-  $('dash-audit').innerHTML=`<div style="font-size:13px;margin-bottom:8px">Score: <strong>${sc}/4</strong></div><div class="pb" style="height:12px"><div class="pf" style="width:${sc*25}%;background:${sc===4?'var(--grn)':sc>=2?'var(--amb)':'var(--red)'}"></div></div><div style="margin-top:10px;font-size:12px;color:var(--mut)">${hT?'&#10003;':'&#10007;'} Mileage<br>${hI?'&#10003;':'&#10007;'} Income<br>${hE?'&#10003;':'&#10007;'} Expenses<br>${hV?'&#10003;':'&#10007;'} Vault</div>`
-
+  $('dash-metrics').innerHTML=`<div class="met"><div class="ml">YTD income</div><div class="mv grn">${fS(totalIncome)}</div></div><div class="met"><div class="ml">YTD expenses</div><div class="mv red">${fS(totalBizExp)}</div></div><div class="met"><div class="ml">Net profit</div><div class="mv ${net>=0?'grn':'red'}">${fS(net)}</div></div><div class="met"><div class="ml">Business km</div><div class="mv">${bizKm.toFixed(1)}</div></div><div class="met"><div class="ml">Business %</div><div class="mv">${(bp*100).toFixed(1)}%</div></div><div class="met"><div class="ml">Best method</div><div class="mv" style="font-size:13px">${better}</div></div>`
+  // GOAL
+  const weekGoal=st.weeklyGoal||500,weekStart=new Date();weekStart.setDate(weekStart.getDate()-weekStart.getDay());const ws=weekStart.toISOString().slice(0,10)
+  const weekIncome=incomes.filter(i=>i.date>=ws).reduce((s,e)=>s+e.total,0),pct=Math.min(100,weekIncome/weekGoal*100)
+  $('dash-goal').innerHTML=`<div class="goal-box"><div class="goal-top"><span class="goal-amt">${fS(weekIncome)}</span><span class="goal-target">/ ${fS(weekGoal)} weekly</span></div><div class="pb" style="height:12px"><div class="pf" style="width:${pct}%;background:${pct>=100?'var(--grn)':'var(--pri)'}"></div></div><p style="font-size:11px;color:var(--mut);margin-top:6px">${pct>=100?'Goal reached!':fS(weekGoal-weekIncome)+' to go'}</p></div>`
+  // DAYS
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],dayTotals=Array(7).fill(0)
+  incomes.forEach(i=>{const d=new Date(i.date).getDay();dayTotals[d]+=i.total})
+  const maxDay=Math.max(...dayTotals)||1
+  $('dash-days').innerHTML=days.map((d,i)=>`<div class="sr"><span class="c">${d}</span><span class="a">${fS(dayTotals[i])}</span></div>`).join('')
+  // PLATFORM
+  const plats={};incomes.forEach(i=>{plats[i.platform]=(plats[i.platform]||0)+i.total})
+  $('dash-plat').innerHTML=Object.entries(plats).sort((a,b)=>b[1]-a[1]).map(([p,a])=>`<div class="sr"><span class="c">${p}</span><span class="a">${fS(a)}</span></div>`).join('')||'<p style="font-size:13px;color:var(--mut)">No income yet</p>'
+  const hT=trips.length>0,hI=incomes.length>0,hE=expenses.length>0,hV=D('vault').length>0,sc=[hT,hI,hE,hV].filter(Boolean).length
+  $('dash-audit').innerHTML=`<div style="font-size:13px;margin-bottom:8px">Score: <strong>${sc}/4</strong></div><div class="pb" style="height:12px"><div class="pf" style="width:${sc*25}%;background:${sc===4?'var(--grn)':sc>=2?'var(--amb)':'var(--red)'}"></div></div>`
+  // TAX ESTIMATOR
+  const tax=calcTax(totalIncome,totalBizExp)
+  $('tax-est').innerHTML=`<div class="tax-lbl">Estimated tax owed (YTD)</div><div class="tax-big">${fS(tax.total)}</div><div class="tax-sub">Set aside ~${Math.round(tax.total/Math.max(1,totalIncome)*100)}% of each payment</div><div class="tax-grid"><div><div class="tl">Federal</div><div class="tv">${fS(tax.fed)}</div></div><div><div class="tl">Provincial</div><div class="tv">${fS(tax.provincial)}</div></div><div><div class="tl">CPP</div><div class="tv">${fS(tax.cpp)}</div></div><div><div class="tl">HST est.</div><div class="tv">${fS(tax.hst)}</div></div></div>`
+  // QUARTERLY DEADLINES
+  const yr=new Date().getFullYear(),deadlines=[{d:`${yr}-03-15`,l:'Q1 instalment'},{d:`${yr}-06-15`,l:'Q2 instalment'},{d:`${yr}-09-15`,l:'Q3 instalment'},{d:`${yr}-12-15`,l:'Q4 instalment'},{d:`${yr+1}-04-30`,l:'Tax filing deadline'}]
+  $('tax-deadlines').innerHTML=deadlines.map(dl=>{const past=dl.d<today;return`<div class="sr"><span class="c">${dl.l}</span><span class="a" style="${past?'text-decoration:line-through;color:var(--mut)':''}">${dl.d}</span></div>`}).join('')
+  // DEDUCTION SUGGESTIONS
+  const cats=expenses.map(e=>e.category),suggestions=[]
+  if(!cats.includes('Phone/Data'))suggestions.push({title:'Phone/Data plan',desc:'You can deduct the business % of your phone bill',amt:'~$30-60/month'})
+  if(!cats.includes('Insurance'))suggestions.push({title:'Car insurance',desc:'Business portion of your auto insurance is deductible',amt:'Varies'})
+  if(!cats.includes('Interest on Car Loan'))suggestions.push({title:'Car loan interest',desc:'If you have a car loan, the business % of interest is deductible',amt:'Varies'})
+  if(!cats.includes('Maintenance'))suggestions.push({title:'Maintenance & repairs',desc:'Oil changes, tires, brakes — business portion deductible',amt:'~$50-200/visit'})
+  if(!cats.includes('Depreciation/CCA'))suggestions.push({title:'CCA (Depreciation)',desc:'Claim Capital Cost Allowance on your vehicle (Class 10 or 10.1)',amt:'Up to $5,000+/yr'})
+  if(suggestions.length===0)suggestions.push({title:'Looking good!',desc:'You are tracking all major deduction categories.',amt:''})
+  $('tax-deductions').innerHTML=suggestions.map(s=>`<div class="ded-card"><div class="ded-title">${s.title}</div><div class="ded-desc">${s.desc}</div>${s.amt?`<div class="ded-amt">${s.amt}</div>`:''}</div>`).join('')
   // INCOME
   $('inc-total').innerHTML=`<div class="mv grn" style="font-size:24px">${fS(totalIncome)}</div>`
-  $('inc-list').innerHTML=incomes.slice(0,30).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date}</div><div style="font-size:14px;font-weight:500">${e.platform}</div><div style="font-size:12px;color:var(--mut)">Earn:${fmt(e.earn)} Tips:${fmt(e.tips)}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--grn)">${fS(e.total)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('income',${e.id})">del</button></div>`).join('')
-
+  $('inc-list').innerHTML=incomes.slice(0,20).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date}</div><div style="font-size:14px;font-weight:500">${e.platform}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--grn)">${fS(e.total)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('income',${e.id})">del</button></div>`).join('')
   // EXPENSES
   const catT={};expenses.forEach(e=>{catT[e.category]=(catT[e.category]||0)+getBE(e)})
   $('exp-cats').innerHTML=Object.entries(catT).sort((a,b)=>b[1]-a[1]).map(([c,a])=>`<div class="sr"><span class="c">${c}</span><span class="a">${fS(a)}</span></div>`).join('')+`<div class="tr"><span>Total</span><span>${fS(totalBizExp)}</span></div>`
-  $('exp-list').innerHTML=expenses.slice(0,30).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date} | ${e.alloc}</div><div style="font-size:14px;font-weight:500">${e.category}${e.desc?': '+e.desc:''}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--red)">${fS(e.amount)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('expenses',${e.id})">del</button></div>`).join('')
-
+  $('exp-list').innerHTML=expenses.slice(0,20).map(e=>`<div style="background:var(--ibg);border-radius:8px;padding:12px;margin-bottom:8px;position:relative"><div style="font-size:11px;color:var(--mut)">${e.date} | ${e.alloc}</div><div style="font-size:14px;font-weight:500">${e.category}${e.desc?': '+e.desc:''}</div><div style="position:absolute;right:12px;top:12px;font-size:16px;font-weight:600;color:var(--red)">${fS(e.amount)}</div><button style="position:absolute;right:12px;bottom:8px;background:none;border:none;color:var(--red);font-size:11px;cursor:pointer" onclick="delEntry('expenses',${e.id})">del</button></div>`).join('')
   // P&L
-  let pl='<div style="font-weight:600;font-size:13px;margin-bottom:6px">REVENUE</div>'
-  ;[['Uber',incomes.filter(i=>i.platform==='Uber').reduce((s,e)=>s+e.earn,0)],['Lyft',incomes.filter(i=>i.platform==='Lyft').reduce((s,e)=>s+e.earn,0)],['Tips',incomes.reduce((s,e)=>s+e.tips,0)],['Bonuses',incomes.reduce((s,e)=>s+e.bonus,0)]].forEach(([k,v])=>{if(v>0)pl+=`<div class="sr"><span class="c">${k}</span><span class="a">${fS(v)}</span></div>`})
-  pl+=`<div class="tr"><span>Revenue</span><span>${fS(totalIncome)}</span></div><div style="font-weight:600;font-size:13px;margin:12px 0 6px">EXPENSES</div>`
-  Object.entries(catT).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{pl+=`<div class="sr"><span class="c">${k}</span><span class="a">${fS(v)}</span></div>`})
-  pl+=`<div class="tr"><span>Expenses</span><span>${fS(totalBizExp)}</span></div><div class="tr" style="border-top-color:var(--grn)"><span>Net profit</span><span style="color:${net>=0?'var(--grn)':'var(--red)'}">${fS(net)}</span></div>`
-  $('pnl').innerHTML=pl
-
+  let pl='<div style="font-weight:600;font-size:13px;margin-bottom:6px">REVENUE</div>';Object.entries(plats).forEach(([k,v])=>{if(v>0)pl+=`<div class="sr"><span class="c">${k}</span><span class="a">${fS(v)}</span></div>`});const tipsT=incomes.reduce((s,e)=>s+e.tips,0);if(tipsT>0)pl+=`<div class="sr"><span class="c">Tips</span><span class="a">${fS(tipsT)}</span></div>`;pl+=`<div class="tr"><span>Revenue</span><span>${fS(totalIncome)}</span></div><div style="font-weight:600;font-size:13px;margin:12px 0 6px">EXPENSES</div>`;Object.entries(catT).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{pl+=`<div class="sr"><span class="c">${k}</span><span class="a">${fS(v)}</span></div>`});pl+=`<div class="tr"><span>Expenses</span><span>${fS(totalBizExp)}</span></div><div class="tr" style="border-top-color:var(--grn)"><span>Net profit</span><span style="color:${net>=0?'var(--grn)':'var(--red)'}">${fS(net)}</span></div>`;$('pnl').innerHTML=pl
   // CRA
-  const diff=Math.abs(cra-totalBizExp)
-  $('cra').innerHTML=`<div class="w2"><div class="${cra>=totalBizExp?'winner':'loser'}"><h4>CRA mileage</h4><div class="big">${fS(cra)}</div><p style="font-size:11px;color:var(--mut)">${bizKm.toFixed(0)} km</p></div><div class="${totalBizExp>=cra?'winner':'loser'}"><h4>Actual</h4><div class="big">${fS(totalBizExp)}</div></div></div><div class="card"><h3>Result</h3><p style="font-size:14px;font-weight:600;color:var(--grn)">Use: ${better}</p><p style="font-size:13px">Saves: ${fS(diff)} | Tax (~30%): ${fS(diff*.3)}</p></div>`
-
+  const diff=Math.abs(cra-totalBizExp);$('cra').innerHTML=`<div class="w2"><div class="${cra>=totalBizExp?'winner':'loser'}"><h4>CRA mileage</h4><div class="big">${fS(cra)}</div><p style="font-size:11px;color:var(--mut)">${bizKm.toFixed(0)} km</p></div><div class="${totalBizExp>=cra?'winner':'loser'}"><h4>Actual</h4><div class="big">${fS(totalBizExp)}</div></div></div><div class="card"><h3>Result</h3><p style="font-size:14px;font-weight:600;color:var(--grn)">Use: ${better}</p><p style="font-size:13px">Saves: ${fS(diff)}</p></div>`
   // SETTINGS
-  const autoP=totalKm>0?bizKm/totalKm:0,ov=O('settings').overridePct
-  $('app-info').innerHTML=`<div class="sr"><span class="c">Auto</span><span class="a">${(autoP*100).toFixed(1)}%</span></div><div class="sr"><span class="c">Override</span><span class="a">${ov?ov+'%':'Off'}</span></div><div class="sr" style="font-weight:600"><span class="c">Active</span><span class="a">${(bp*100).toFixed(1)}%</span></div>`
+  const autoP=totalKm>0?bizKm/totalKm:0,ov=O('settings').overridePct;$('app-info').innerHTML=`<div class="sr"><span class="c">Auto</span><span class="a">${(autoP*100).toFixed(1)}%</span></div><div class="sr"><span class="c">Override</span><span class="a">${ov?ov+'%':'Off'}</span></div><div class="sr" style="font-weight:600"><span class="c">Active</span><span class="a">${(bp*100).toFixed(1)}%</span></div>`
   $('audit-score').innerHTML=`<div style="text-align:center;padding:10px"><div style="font-size:48px;font-weight:700;color:${sc===4?'var(--grn)':sc>=2?'var(--amb)':'var(--red)'}">${sc*25}%</div><div style="font-size:13px;color:var(--mut)">CRA audit ready</div></div>`
   renderVault()
 }
-
 // INIT
 const td=new Date().toISOString().slice(0,10);$('m-date').value=td;$('i-date').value=td;$('e-date').value=td
-const ss=getSt();$('s-cp').value=ss.carPrice;$('s-cl').value=ss.carLife;$('s-yo').value=ss.yearsOwned;$('s-od').value=ss.odometer;$('s-r1').value=ss.rate1;$('s-r2').value=ss.rate2
+const ss=getSt();$('s-cp').value=ss.carPrice;$('s-cl').value=ss.carLife;$('s-yo').value=ss.yearsOwned;$('s-od').value=ss.odometer;$('s-r1').value=ss.rate1;$('s-r2').value=ss.rate2;$('s-goal').value=ss.weeklyGoal;$('s-prov').value=ss.province||'ON'
 renderNav();renderMenu();render()
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})
-// Request location permission immediately on first load
 if(navigator.geolocation)navigator.geolocation.getCurrentPosition(()=>{},()=>{},{enableHighAccuracy:true})
 </script>
 </body>
