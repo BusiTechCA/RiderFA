@@ -71,6 +71,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .track-bar .info{flex:1;font-size:12px}
 .track-bar .info strong{font-size:14px}
 .track-bar .stop-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+.track-status{background:var(--ibg);border:1px solid var(--brd);border-radius:8px;padding:10px;margin-top:12px;text-align:left;font-size:12px;color:var(--mut)}
+.track-status strong{color:var(--txt)}
+.track-status .ok{color:var(--grn);font-weight:700}
+.track-status .warn{color:var(--amb);font-weight:700}
+.track-status .bad{color:var(--red);font-weight:700}
 /* TRIP CARD — swipeable */
 .trip-card{background:var(--card);border-radius:var(--rad);padding:14px;margin-bottom:10px;box-shadow:var(--sh);border-left:4px solid var(--amb);position:relative;transition:transform .2s,opacity .2s;touch-action:pan-y}
 .trip-card.classified{border-left-color:var(--grn);opacity:.7}
@@ -208,7 +213,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="page" id="page-track">
   <div class="card" style="text-align:center">
     <h3>Auto-tracking</h3>
-    <p style="font-size:13px;color:var(--mut);margin-bottom:16px">Detects driving >15 km/h. Trip ends after 5 min stopped. Traffic lights never split trips.</p>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:16px">Detects sustained driving above 15 km/h, filters GPS noise, and ends a trip after 5 minutes parked.</p>
     <button class="btn bp" id="auto-toggle" onclick="toggleAutoTrack()" style="font-size:16px;padding:16px">Enable auto-tracking</button>
     <div id="track-stats" style="margin-top:16px"></div>
   </div>
@@ -314,19 +319,109 @@ function renderMenu(){const favs=getFavs();$('menu-items').innerHTML=PAGES.map(p
 function renderNav(){const favs=getFavs(),unc=D('trips').filter(t=>t.type==='unclassified').length;$('bnav').innerHTML=favs.map(fid=>{const p=PAGES.find(x=>x.id===fid);if(!p)return'';const badge=(fid==='trips'&&unc>0)?`<span class="badge">${unc}</span>`:'';return`<button class="bnav-item ${currentPage===fid?'active':''}" onclick="navTo('${fid}')"><span class="bi">${p.icon}</span>${p.label}${badge}</button>`}).join('')}
 
 // ===== GPS TRACKING =====
-let autoTrack=false,watchId=null,curTrip=null,tripTimer=null,stopTimeout=null,wakeLock=null,lastMovingTime=0,lastGPSTime=0
-const DRIVE_SPEED=15/3.6,STOP_MS=300000
+let autoTrack=false,watchId=null,curTrip=null,tripTimer=null,stopTimeout=null,wakeLock=null,lastMovingTime=0,lastGPSTime=0,lastFix=null,driveCandidate=null,gpsStatus='Idle'
+const DRIVE_SPEED=15/3.6,STOP_MS=300000,START_SUSTAIN_MS=12000,MAX_ACC=65,MIN_MOVE_KM=0.01,MAX_REASONABLE_SPEED=55
 function toggleAutoTrack(){if(autoTrack)stopAutoTrack();else startAutoTrack()}
-function startAutoTrack(){if(!navigator.geolocation)return alert('GPS not available');autoTrack=true;localStorage.setItem('autoTrackOn','1');$('auto-toggle').textContent='Disable auto-tracking';$('auto-toggle').style.background='var(--red)';$('track-bar').classList.add('active');acquireWakeLock();startGPS();tripTimer=setInterval(()=>{if(curTrip){const el=Math.floor((Date.now()-curTrip.startTime)/1000);$('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)}if(autoTrack&&Date.now()-lastGPSTime>20000){if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){}startGPS()}},1000)}
-function startGPS(){watchId=navigator.geolocation.watchPosition(onGPS,err=>{if(autoTrack)setTimeout(()=>{if(autoTrack)startGPS()},5000)},{enableHighAccuracy:true,maximumAge:3000,timeout:15000})}
-function onGPS(pos){lastGPSTime=Date.now();const speed=pos.coords.speed!=null?pos.coords.speed:0,acc=pos.coords.accuracy||999,pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now(),speed};if(acc>50)return;if(!curTrip&&speed>=DRIVE_SPEED){curTrip={id:Date.now(),startTime:Date.now(),points:[pt],startLat:pt.lat,startLng:pt.lng,dist:0,moving:true};lastMovingTime=Date.now();reverseGeo(pt.lat,pt.lng).then(a=>{if(curTrip)curTrip.startAddr=a});if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}}else if(curTrip){const last=curTrip.points[curTrip.points.length-1],d=hav(last.lat,last.lng,pt.lat,pt.lng);if(d>0.005){curTrip.dist+=d;curTrip.points.push(pt)}curTrip.endLat=pt.lat;curTrip.endLng=pt.lng;if(speed>=DRIVE_SPEED){curTrip.moving=true;lastMovingTime=Date.now();if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}}else if(speed<2){if(curTrip.moving){curTrip.moving=false;if(!stopTimeout){stopTimeout=setTimeout(()=>{if(curTrip&&!curTrip.moving&&(Date.now()-lastMovingTime)>=STOP_MS)finishTrip();stopTimeout=null},STOP_MS)}}}else{if(!curTrip.moving){curTrip.moving=true;lastMovingTime=Date.now();if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}}}$('bar-km').textContent=curTrip.dist.toFixed(1)+' km';const el=Math.floor((Date.now()-curTrip.startTime)/1000);$('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)}}
-function stopAutoTrack(){if(curTrip)finishTrip();autoTrack=false;localStorage.removeItem('autoTrackOn');if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){};watchId=null;if(tripTimer){clearInterval(tripTimer);tripTimer=null}if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}releaseWakeLock();$('auto-toggle').textContent='Enable auto-tracking';$('auto-toggle').style.background='var(--pri)';$('track-bar').classList.remove('active');$('bar-km').textContent='0.0 km';$('bar-time').textContent='0:00';render()}
-function finishTrip(){if(!curTrip||curTrip.dist<0.1){curTrip=null;return}const trip={id:curTrip.id,date:new Date(curTrip.startTime).toISOString().slice(0,10),time:new Date(curTrip.startTime).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),endTime:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),totalKm:Math.round(curTrip.dist*100)/100,duration:Math.floor((Date.now()-curTrip.startTime)/60000),startAddr:curTrip.startAddr||'',endAddr:'',type:'unclassified',gps:true};if(curTrip.endLat)reverseGeo(curTrip.endLat,curTrip.endLng).then(a=>{const trips=D('trips');const t=trips.find(x=>x.id===trip.id);if(t){t.endAddr=a;D('trips',trips);render()}});D('trips',[trip,...D('trips')]);curTrip=null;if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}if(navigator.vibrate)navigator.vibrate([200,100,200]);render()}
-async function reverseGeo(lat,lng){try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&addressdetails=1`);const d=await r.json(),a=d.address;let addr='';if(a.house_number)addr+=a.house_number+' ';addr+=a.road||a.pedestrian||'';if(a.city||a.town||a.village)addr+=(addr?', ':'')+(a.city||a.town||a.village);return addr||d.display_name||'Unknown'}catch{return''}}
+function startAutoTrack(){
+  if(!navigator.geolocation)return alert('GPS not available')
+  autoTrack=true;localStorage.setItem('autoTrackOn','1');restoreActiveTrip()
+  $('auto-toggle').textContent='Disable auto-tracking';$('auto-toggle').style.background='var(--red)';$('track-bar').classList.add('active')
+  acquireWakeLock();startGPS();tickTracking()
+  tripTimer=setInterval(()=>{tickTracking();if(autoTrack&&Date.now()-lastGPSTime>25000)restartGPS('GPS paused; reconnecting')},1000)
+}
+function startGPS(){
+  if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){}
+  gpsStatus='Waiting for GPS fix';updateTrackingUI()
+  watchId=navigator.geolocation.watchPosition(onGPS,onGPSError,{enableHighAccuracy:true,maximumAge:1000,timeout:20000})
+}
+function restartGPS(msg){gpsStatus=msg||'Reconnecting GPS';if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){};watchId=null;startGPS()}
+function onGPSError(err){
+  gpsStatus=(err&&err.code===1)?'Location permission denied':'GPS error; retrying'
+  updateTrackingUI()
+  if(autoTrack)setTimeout(()=>{if(autoTrack)restartGPS()},5000)
+}
+function onGPS(pos){
+  const now=Date.now(),acc=pos.coords.accuracy||999
+  lastGPSTime=now
+  if(acc>MAX_ACC){gpsStatus='Weak GPS accuracy: '+Math.round(acc)+' m';updateTrackingUI();return}
+  const pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:now,acc,speed:null}
+  const calc=deriveMotion(pt,pos.coords.speed)
+  pt.speed=calc.speed
+  gpsStatus='GPS locked: '+Math.round(acc)+' m accuracy, '+Math.round(pt.speed*3.6)+' km/h'
+  if(calc.jump){updateTrackingUI();persistActiveTrip();return}
+  if(!curTrip)maybeStartTrip(pt)
+  else updateTrip(pt,calc.distKm)
+  lastFix=pt;persistActiveTrip();updateTrackingUI()
+}
+function deriveMotion(pt,reportedSpeed){
+  let distKm=0,dt=0,computed=0,jump=false
+  if(lastFix){distKm=hav(lastFix.lat,lastFix.lng,pt.lat,pt.lng);dt=Math.max(1,(pt.ts-lastFix.ts)/1000);computed=distKm*1000/dt}
+  let speed=Number.isFinite(reportedSpeed)?Math.max(reportedSpeed,computed):computed
+  if(speed>MAX_REASONABLE_SPEED&&distKm>.2){jump=true;speed=0;gpsStatus='Ignored GPS jump'}
+  return{distKm,dt,speed,jump}
+}
+function maybeStartTrip(pt){
+  if(pt.speed>=DRIVE_SPEED){
+    if(!driveCandidate)driveCandidate={first:pt,last:pt,since:pt.ts}
+    else driveCandidate.last=pt
+    if(pt.ts-driveCandidate.since>=START_SUSTAIN_MS)beginTrip(driveCandidate.first,pt)
+  }else if(pt.speed<2){driveCandidate=null}
+}
+function beginTrip(firstPt,pt){
+  curTrip={id:Date.now(),startTime:firstPt.ts,points:[firstPt,pt],startLat:firstPt.lat,startLng:firstPt.lng,endLat:pt.lat,endLng:pt.lng,dist:Math.max(0,hav(firstPt.lat,firstPt.lng,pt.lat,pt.lng)),moving:true,quality:{accepted:2,rejected:0,maxAccuracy:Math.max(firstPt.acc||0,pt.acc||0)}}
+  lastMovingTime=Date.now();driveCandidate=null
+  reverseGeo(firstPt.lat,firstPt.lng).then(a=>{if(curTrip&&curTrip.id)curTrip.startAddr=a;persistActiveTrip();render()})
+  if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
+}
+function updateTrip(pt,distKm){
+  const last=curTrip.points[curTrip.points.length-1],gap=(pt.ts-last.ts)/1000
+  if(!curTrip.quality)curTrip.quality={accepted:curTrip.points.length,rejected:0,maxAccuracy:0}
+  if(distKm>=MIN_MOVE_KM&&pt.speed<=MAX_REASONABLE_SPEED){
+    curTrip.dist+=distKm;curTrip.points.push(pt);curTrip.quality.accepted++
+  }else if(distKm>0){
+    curTrip.quality.rejected++
+  }
+  curTrip.endLat=pt.lat;curTrip.endLng=pt.lng;curTrip.quality.maxAccuracy=Math.max(curTrip.quality.maxAccuracy||0,pt.acc||0)
+  if(pt.speed>=2.5||distKm>.05){curTrip.moving=true;lastMovingTime=Date.now();if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}}
+  else if(gap>20||pt.speed<1.5){
+    if(curTrip.moving){curTrip.moving=false}
+    if(!stopTimeout)stopTimeout=setTimeout(()=>{if(curTrip&&!curTrip.moving&&(Date.now()-lastMovingTime)>=STOP_MS)finishTrip();stopTimeout=null},STOP_MS)
+  }
+}
+function stopAutoTrack(){
+  if(curTrip)finishTrip()
+  autoTrack=false;localStorage.removeItem('autoTrackOn');localStorage.removeItem('activeTrip');driveCandidate=null;lastFix=null
+  if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){};watchId=null
+  if(tripTimer){clearInterval(tripTimer);tripTimer=null}
+  if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
+  releaseWakeLock();$('auto-toggle').textContent='Enable auto-tracking';$('auto-toggle').style.background='var(--pri)';$('track-bar').classList.remove('active');$('bar-km').textContent='0.0 km';$('bar-time').textContent='0:00';gpsStatus='Idle';render()
+}
+function finishTrip(){
+  if(!curTrip||curTrip.dist<0.1){curTrip=null;localStorage.removeItem('activeTrip');return}
+  const endMs=Date.now(),trip={id:curTrip.id,date:new Date(curTrip.startTime).toISOString().slice(0,10),time:new Date(curTrip.startTime).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),endTime:new Date(endMs).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),totalKm:Math.round(curTrip.dist*100)/100,duration:Math.max(1,Math.floor((endMs-curTrip.startTime)/60000)),startAddr:curTrip.startAddr||'',endAddr:'',type:'unclassified',gps:true,gpsAccuracy:Math.round(curTrip.quality?.maxAccuracy||0),gpsPoints:curTrip.points.length}
+  if(curTrip.endLat)reverseGeo(curTrip.endLat,curTrip.endLng).then(a=>{const trips=D('trips');const t=trips.find(x=>x.id===trip.id);if(t){t.endAddr=a;D('trips',trips);render()}})
+  D('trips',[trip,...D('trips')]);curTrip=null;driveCandidate=null;localStorage.removeItem('activeTrip');$('bar-km').textContent='0.0 km';$('bar-time').textContent='0:00'
+  if(stopTimeout){clearTimeout(stopTimeout);stopTimeout=null}
+  if(navigator.vibrate)navigator.vibrate([200,100,200])
+  render()
+}
+function tickTracking(){if(curTrip){const el=Math.floor((Date.now()-curTrip.startTime)/1000);$('bar-km').textContent=curTrip.dist.toFixed(1)+' km';$('bar-time').textContent=Math.floor(el/60)+':'+(el%60<10?'0':'')+(el%60)}updateTrackingUI()}
+function updateTrackingUI(){
+  const el=$('track-stats');if(!el)return
+  if(!autoTrack){el.innerHTML='<div class="track-status"><strong>Status:</strong> Off</div>';return}
+  const state=curTrip?'Recording trip':(driveCandidate?'Confirming driving':'Monitoring for driving')
+  const age=lastGPSTime?Math.round((Date.now()-lastGPSTime)/1000)+'s ago':'not yet'
+  const cls=lastGPSTime&&Date.now()-lastGPSTime<20000?'ok':(lastGPSTime?'warn':'bad')
+  const dist=curTrip?`<div><strong>Current trip:</strong> ${curTrip.dist.toFixed(2)} km, ${curTrip.points.length} GPS points</div>`:''
+  el.innerHTML=`<div class="track-status"><div><strong>Status:</strong> <span class="${cls}">${state}</span></div><div><strong>GPS:</strong> ${gpsStatus}</div><div><strong>Last update:</strong> ${age}</div>${dist}<div style="margin-top:6px">Browser PWAs cannot track after the browser is fully closed. For true 24/7 tracking, this logic must be moved into a native Android/iOS background location service.</div></div>`
+}
+function persistActiveTrip(){if(curTrip)localStorage.setItem('activeTrip',JSON.stringify(curTrip))}
+function restoreActiveTrip(){if(curTrip)return;try{const t=JSON.parse(localStorage.getItem('activeTrip'));if(t&&t.id&&t.points&&t.points.length){curTrip=t;lastMovingTime=Date.now();lastFix=t.points[t.points.length-1];$('track-bar').classList.add('active')}}catch(e){}}
+async function reverseGeo(lat,lng){try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&addressdetails=1`);const d=await r.json(),a=d.address||{};let addr='';if(a.house_number)addr+=a.house_number+' ';addr+=a.road||a.pedestrian||a.footway||'';if(a.city||a.town||a.village||a.municipality)addr+=(addr?', ':'')+(a.city||a.town||a.village||a.municipality);if(a.state)addr+=(addr?', ':'')+a.state;return addr||d.display_name||'Unknown'}catch{return''}}
 function hav(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
-async function acquireWakeLock(){if(!('wakeLock' in navigator))return;try{wakeLock=await navigator.wakeLock.request('screen')}catch(e){}}
+async function acquireWakeLock(){if(!('wakeLock' in navigator))return;try{wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener&&wakeLock.addEventListener('release',()=>{wakeLock=null})}catch(e){}}
 function releaseWakeLock(){if(wakeLock){try{wakeLock.release()}catch(e){};wakeLock=null}}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&autoTrack){acquireWakeLock();if(Date.now()-lastGPSTime>15000){if(watchId!==null)try{navigator.geolocation.clearWatch(watchId)}catch(e){};startGPS()}}})
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&autoTrack){acquireWakeLock();if(Date.now()-lastGPSTime>15000)restartGPS('Page resumed; reconnecting GPS')}})
 window.addEventListener('load',()=>{if(localStorage.getItem('autoTrackOn')==='1')startAutoTrack()})
 
 // ===== SWIPE GESTURES =====
@@ -440,7 +535,7 @@ function render(){
   // TRACK
   const today=new Date().toISOString().slice(0,10),todayT=trips.filter(t=>t.date===today)
   $('today-summary').innerHTML=`<div class="sr"><span class="c">Trips today</span><span class="a">${todayT.length}</span></div><div class="sr"><span class="c">KM today</span><span class="a">${todayT.reduce((s,t)=>s+t.totalKm,0).toFixed(1)}</span></div>`
-  $('track-stats').innerHTML=autoTrack?`<p style="font-size:13px;color:var(--grn);font-weight:600">Active${curTrip?' — on trip':''}</p>`:`<p style="font-size:13px;color:var(--mut)">Off</p>`
+  updateTrackingUI()
   // DASHBOARD
   $('dash-metrics').innerHTML=`<div class="met"><div class="ml">YTD income</div><div class="mv grn">${fS(totalIncome)}</div></div><div class="met"><div class="ml">YTD expenses</div><div class="mv red">${fS(totalBizExp)}</div></div><div class="met"><div class="ml">Net profit</div><div class="mv ${net>=0?'grn':'red'}">${fS(net)}</div></div><div class="met"><div class="ml">Business km</div><div class="mv">${bizKm.toFixed(1)}</div></div><div class="met"><div class="ml">Business %</div><div class="mv">${(bp*100).toFixed(1)}%</div></div><div class="met"><div class="ml">Best method</div><div class="mv" style="font-size:13px">${better}</div></div>`
   // GOAL
