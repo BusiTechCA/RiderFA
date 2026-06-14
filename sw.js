@@ -1,4 +1,4 @@
-const CACHE = 'milewise-v1';
+const CACHE = 'lucra-v1';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
